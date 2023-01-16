@@ -1,5 +1,5 @@
 const request = require('supertest');
-//const app = require('../db/app.js');
+const app = require('../app/app.js');
 const db = require('../db/connection.js');
 const seed = require('../db/seeds/seed.js');
 const data = require('../db/data/test-data/index.js');
@@ -14,8 +14,8 @@ afterAll(() => {
 
 describe("/api/topics", () => {
     describe("GET", () => {
-        test("Returns status code: 200 when okay", () => {
-            
-        })
-    })
-})
+        test("Returns 'Status Code: 200' if no error", () => {
+            return request(app).get('/api/topics').expect(200);
+        });
+    });
+});
