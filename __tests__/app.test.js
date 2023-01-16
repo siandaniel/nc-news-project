@@ -161,5 +161,25 @@ describe("/api/articles/:article_id", () => {
                 expect(article).toHaveProperty("article_img_url", expect.any(String));
             });
         });
+        test("Returns the correct article object for the specified article ID", () => {
+            return request(app).get('/api/articles/1').expect(200)
+            .then(({ body }) => {
+                const article = body.requestedArticle;
+                expect(article).toHaveProperty("author", "butter_bridge");
+                expect(article).toHaveProperty("title", "Living in the shadow of a great man");
+                expect(article).toHaveProperty("article_id", 1);
+                expect(article).toHaveProperty("body", "I find this existence challenging");
+                expect(article).toHaveProperty("topic", "mitch");
+                expect(article).toHaveProperty("created_at", "2020-07-09T20:11:00.000Z");
+                expect(article).toHaveProperty("votes", 100);
+                expect(article).toHaveProperty("article_img_url", "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700");
+            });
+        });
+        test("Returns 'Status: 404: with custom error message if invalid endpoint provided e.g. misspelt path", () => {
+            return request(app).get('/api/articlees/1').expect(404).then((body) => {
+                const errorMsg = body.error.text
+                expect(errorMsg).toBe("Invalid path provided - please try again");
+            });
+        });
     });
 });
