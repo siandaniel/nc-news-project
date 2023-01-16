@@ -17,5 +17,13 @@ describe("/api/topics", () => {
         test("Returns 'Status Code: 200' if no error", () => {
             return request(app).get('/api/topics').expect(200);
         });
+        test("Returns topic objects contained inside an array", () => {
+            return request(app).get('/api/topics').expect(200)
+            .then(({ body }) => {
+                const topics = body.topics;
+                console.log(topics)
+                expect(Array.isArray(topics)).toBe(true);
+            });
+        });
     });
 });
