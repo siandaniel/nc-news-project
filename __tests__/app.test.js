@@ -50,7 +50,7 @@ describe("/api/topics", () => {
                 expect(topics[2].slug).toBe("paper");
             });
         });
-        test("Returns 'Status: 404' if invalid path provided, e.g. misspelt path", () => {
+        test("Returns 'Status: 404' if invalid path provided to topics, e.g. misspelt path", () => {
             return request(app).get('/api/topisc').expect(404);
         });
         test("Returns custom error message if invalid path provided ", () => {
@@ -123,6 +123,15 @@ describe("/api/articles", () => {
                 expect(articles[0]).toHaveProperty("votes", 0);
                 expect(articles[0]).toHaveProperty("article_img_url", 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700');
                 expect(articles[0]).toHaveProperty("comment_count", '2');
+            });
+        });
+        test("Returns 'Status: 404' if invalid path provided to articles, e.g. misspelt path", () => {
+            return request(app).get('/api/articlees').expect(404);
+        });
+        test("Returns custom error message if invalid path provided ", () => {
+            return request(app).get('/api/articlees').expect(404).then((body) => {
+                const errorMsg = body.error.text
+                expect(errorMsg).toBe("Invalid path provided - please try again");
             });
         });
     });
