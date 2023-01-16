@@ -14,7 +14,7 @@ afterAll(() => {
 
 describe("/api/topics", () => {
     describe("GET", () => {
-        test("Returns 'Status Code: 200' if no error", () => {
+        test("Returns 'Status: 200' if no error in path", () => {
             return request(app).get('/api/topics').expect(200);
         });
         test("Returns topic objects contained inside an array", () => {
@@ -48,6 +48,15 @@ describe("/api/topics", () => {
                 expect(topics[1].slug).toBe("cats");
                 expect(topics[2].description).toBe("what books are made of");
                 expect(topics[2].slug).toBe("paper");
+            });
+        });
+        test("Returns 'Status: 404' if invalid path provided, e.g. misspelt path", () => {
+            return request(app).get('/api/topisc').expect(404);
+        });
+        test("Returns custom error message if invalid path provided ", () => {
+            return request(app).get('/api/topisc').expect(404).then((body) => {
+                const errorMsg = body.error.text
+                expect(errorMsg).toBe("Invalid path provided - please try again");
             });
         });
     });
