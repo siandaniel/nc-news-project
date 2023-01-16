@@ -111,5 +111,19 @@ describe("/api/articles", () => {
                 expect(articles[articles.length-1].article_id).toBe(7);
             });
         });
+        test("Correct values are inputted to article object keys", () => {
+            return request(app).get('/api/articles').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles[0]).toHaveProperty("author", 'icellusedkars');
+                expect(articles[0]).toHaveProperty("title", 'Eight pug gifs that remind me of mitch');
+                expect(articles[0]).toHaveProperty("article_id", 3);
+                expect(articles[0]).toHaveProperty("topic", 'mitch');
+                expect(articles[0]).toHaveProperty("created_at", '2020-11-03T09:12:00.000Z');
+                expect(articles[0]).toHaveProperty("votes", 0);
+                expect(articles[0]).toHaveProperty("article_img_url", 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700');
+                expect(articles[0]).toHaveProperty("comment_count", '2');
+            });
+        });
     });
 });
