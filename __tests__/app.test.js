@@ -21,9 +21,35 @@ describe("/api/topics", () => {
             return request(app).get('/api/topics').expect(200)
             .then(({ body }) => {
                 const topics = body.topics;
-                console.log(topics)
                 expect(Array.isArray(topics)).toBe(true);
+            });
+        });
+        test("Each topic object contains the keys 'slug' and 'description'", () => {
+            return request(app).get('/api/topics').expect(200)
+            .then(({ body }) => {
+                const topics = body.topics;
+                topics.forEach((topic) => {
+                    expect(topic).toEqual(
+                        expect.objectContaining({
+                            slug: expect.any(String),
+                            description: expect.any(String)
+                        })
+                    )
+                });
+            });
+        });
+        test("Correct values are added to the keys in the topic objects", () => {
+            return request(app).get('/api/topics').expect(200)
+            .then(({ body }) => {
+                const topics = body.topics;
+                expect(topics[0].description).toBe("The man, the Mitch, the legend");
+                expect(topics[0].slug).toBe("mitch");
+                expect(topics[1].description).toBe("Not dogs");
+                expect(topics[1].slug).toBe("cats");
+                expect(topics[2].description).toBe("what books are made of");
+                expect(topics[2].slug).toBe("paper");
             });
         });
     });
 });
+
