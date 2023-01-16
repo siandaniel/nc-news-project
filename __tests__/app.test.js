@@ -70,9 +70,36 @@ describe("/api/articles", () => {
         test("Returns article objects contained inside an array", () => {
             return request(app).get('/api/articles').expect(200)
             .then(({ body }) => {
-                console.log(body.articles)
                 const articles = body.articles;
                 expect(Array.isArray(articles)).toBe(true);
+            });
+        });
+        test("Returns ALL article objects", () => {
+            return request(app).get('/api/articles').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles.length).toBe(12);
+            });
+        });
+        test("Each article object contains the correct keys", () => {
+            return request(app).get('/api/articles').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                console.log(articles)
+                articles.forEach((article) => {
+                    expect(article).toEqual(
+                        expect.objectContaining({
+                            author: expect.any(String),
+                            title: expect.any(String),
+                            article_id: expect.any(Number),
+                            topic: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            article_img_url: expect.any(String),
+                            comment_count: expect.any(String)
+                        })
+                    )
+                });
             });
         });
     });
