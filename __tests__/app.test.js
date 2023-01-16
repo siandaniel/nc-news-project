@@ -85,7 +85,6 @@ describe("/api/articles", () => {
             return request(app).get('/api/articles').expect(200)
             .then(({ body }) => {
                 const articles = body.articles;
-                console.log(articles)
                 articles.forEach((article) => {
                     expect(article).toEqual(
                         expect.objectContaining({
@@ -102,6 +101,15 @@ describe("/api/articles", () => {
                 });
             });
         });
+        test("Article objects are sorted by date in descending order as default", () => {
+            return request(app).get('/api/articles').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles[0].article_id).toBe(3);
+                expect(articles[1].article_id).toBe(6);
+                expect(articles[articles.length-2].article_id).toBe(11);
+                expect(articles[articles.length-1].article_id).toBe(7);
+            });
+        });
     });
 });
-
