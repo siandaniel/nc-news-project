@@ -161,7 +161,7 @@ describe("/api/articles/:article_id", () => {
                 expect(article).toHaveProperty("article_img_url", expect.any(String));
             });
         });
-        test("Returns the correct article object for the specified article ID", () => {
+        test("Returns the correct article object for article ID 1", () => {
             return request(app).get('/api/articles/1').expect(200)
             .then(({ body }) => {
                 const article = body.requestedArticle;
@@ -175,7 +175,28 @@ describe("/api/articles/:article_id", () => {
                 expect(article).toHaveProperty("article_img_url", "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700");
             });
         });
-        test("Returns 'Status: 404: with custom error message if invalid endpoint provided e.g. misspelt path", () => {
+        test("Returns the correct article object for other valid article IDs", () => {
+            return request(app).get('/api/articles/2').expect(200)
+            .then(({ body }) => {
+                const articleA = body.requestedArticle;
+                expect(articleA).toHaveProperty("article_id", 2);
+            })
+            .then(() => {
+                return request(app).get('/api/articles/3').expect(200)
+            })
+            .then(({ body }) => {
+                const articleB = body.requestedArticle;
+                expect(articleB).toHaveProperty("article_id", 3);
+            })
+            .then(() => {
+                return request(app).get('/api/articles/12').expect(200)
+            })
+            .then(({ body }) => {
+                const articleC = body.requestedArticle;
+                expect(articleC).toHaveProperty("article_id", 12);
+            })
+        });
+        test("Returns 'Status: 404' with custom error message if invalid endpoint provided e.g. misspelt path", () => {
             return request(app).get('/api/articlees/1').expect(404).then((body) => {
                 const errorMsg = body.error.text
                 expect(errorMsg).toBe("Invalid path provided - please try again");
