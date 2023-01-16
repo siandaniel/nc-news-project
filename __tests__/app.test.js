@@ -139,8 +139,13 @@ describe("/api/articles", () => {
 
 describe("/api/articles/:article_id", () => {
     describe("GET", () => {
-        test("Returns 'Status: 200' if no error in path", () => {
-            return request(app).get('/api/articles/1').expect(200);
+        test("Returns 'Status: 200' with single article object if valid article ID", () => {
+            return request(app).get('/api/articles/1').expect(200)
+            .then(({ body }) => {
+                const article = body.requestedArticle;
+                expect(typeof article).toBe("object");
+                expect(Array.isArray(article)).toBe(false);
+            });
         });
     });
 });

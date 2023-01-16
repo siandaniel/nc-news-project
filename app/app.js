@@ -5,9 +5,9 @@ const app = express();
 
 app.get('/api/topics', getTopics);
 
-app.get('/api/articles/:article_id', getArticleById);
-
 app.get('/api/articles', getArticles);
+
+app.get('/api/articles/:article_id', getArticleById);
 
 app.get(`*`, (request, response) => {
     response.status(404).send("Invalid path provided - please try again")
