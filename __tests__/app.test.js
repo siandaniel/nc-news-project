@@ -62,3 +62,10 @@ describe("/api/topics", () => {
     });
 });
 
+describe("/api/articles/:article_id", () => {
+    describe("GET", () => {
+        test("Returns 'Status: 200' if no error in path", () => {
+            return request(app).get('/api/articles/1').expect(200);
+        });
+    });
+});

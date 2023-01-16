@@ -6,4 +6,8 @@ const getTopics = (request, response, next) => {
     })
 };
 
-module.exports = { getTopics };
+const getArticleById = (request, response, next) => {
+    response.status(200).send();
+}
+
+module.exports = { getTopics, getArticleById };
