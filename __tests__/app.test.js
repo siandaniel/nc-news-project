@@ -213,30 +213,21 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(comments.length).toBe(11);
             });
         });
-        test("Each comment object contains the correct keys", () => {
+        test("Each comment object contains the expected keys for that article ID", () => {
             return request(app).get('/api/articles/1/comments').expect(200)
             .then(({ body }) => {
                 const comments = body.comments;
                 comments.forEach((comment) => {
                     expect(comment).toEqual(
                         expect.objectContaining({
+                            article_id: 1,
                             comment_id: expect.any(Number),
                             votes: expect.any(Number),
                             created_at: expect.any(String),
                             author: expect.any(String),
-                            body: expect.any(String),
-                            article_id: expect.any(Number)
+                            body: expect.any(String)
                         })
                     )
-                });
-            });
-        });
-        test("Only returns comments for the specified article ID", () => {
-            return request(app).get('/api/articles/1/comments').expect(200)
-            .then(({ body }) => {
-                const comments = body.comments;
-                comments.forEach((comment) => {
-                    expect(comment.article_id).toBe(1)
                 });
             });
         });
