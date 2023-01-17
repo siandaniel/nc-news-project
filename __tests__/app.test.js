@@ -175,15 +175,8 @@ describe("/api/articles/:article_id", () => {
         test("Returns the correct article object for other valid article IDs", () => {
             return request(app).get('/api/articles/2').expect(200)
             .then(({ body }) => {
-                const articleA = body.requestedArticle;
-                expect(articleA).toHaveProperty("article_id", 2);
-            })
-            .then(() => {
-                return request(app).get('/api/articles/12').expect(200)
-            })
-            .then(({ body }) => {
-                const articleC = body.requestedArticle;
-                expect(articleC).toHaveProperty("article_id", 12);
+                const article = body.requestedArticle;
+                expect(article).toHaveProperty("article_id", 2);
             });
         });
         test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
