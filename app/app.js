@@ -1,5 +1,5 @@
 const express = require('express');
-const { getTopics, getArticles, getArticleById } = require('./controllers.js');
+const { getTopics, getArticles, getArticleById, getComments } = require('./controllers.js');
 
 const app = express();
 
@@ -8,6 +8,8 @@ app.get('/api/topics', getTopics);
 app.get('/api/articles', getArticles);
 
 app.get('/api/articles/:article_id', getArticleById);
+
+app.get('/api/articles/:article_id/comments', getComments);
 
 app.use((request, response, next) => {
     response.status(404).send({ msg: "Not found - this path does not exist" })
