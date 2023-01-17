@@ -250,5 +250,19 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(comments[comments.length-1].comment_id).toBe(9);
             });
         });
+        test("Correct values are added to the comment objects' keys", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(comments[0]).toEqual({
+                    comment_id: 5,
+                    body: "I hate streaming noses",
+                    votes: 0,
+                    author: "icellusedkars",
+                    article_id: 1,
+                    created_at: "2020-11-03T21:00:00.000Z",
+                });
+            });
+        });
     });
 });
