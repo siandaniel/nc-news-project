@@ -193,3 +193,85 @@ describe("/api/articles/:article_id", () => {
         });
     });
 });
+
+describe("/api/articles/:article_id/comments", () => {
+    describe("GET", () => {
+        test("Returns 'Status: 200' if no error in path", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+        });
+        test("Returns comment objects contained inside an array", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(Array.isArray(comments)).toBe(true);
+            });
+        });
+        test("Returns correct number of comment objects for the article ID", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(comments.length).toBe(11);
+            });
+        });
+        test("Each comment object contains the expected keys for that article ID", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                comments.forEach((comment) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            article_id: 1,
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String)
+                        })
+                    )
+                });
+            });
+        });
+        test("Comment objects are sorted with most recent comments first", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(comments[0].comment_id).toBe(5);
+                expect(comments[1].comment_id).toBe(2);
+                expect(comments[comments.length-2].comment_id).toBe(4);
+                expect(comments[comments.length-1].comment_id).toBe(9);
+            });
+        });
+        test("Correct values are added to the comment objects' keys", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(comments[0]).toEqual({
+                    comment_id: 5,
+                    body: "I hate streaming noses",
+                    votes: 0,
+                    author: "icellusedkars",
+                    article_id: 1,
+                    created_at: "2020-11-03T21:00:00.000Z",
+                });
+            });
+        });
+        test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
+            return request(app).get('/api/articles/abc/comments').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
+            return request(app).get('/api/articles/392/comments').expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no article of this ID in database");
+            });
+        });
+        test("Returns 'Status: 200' and empty array for existing article IDs with no comments, without invoking error handler", () => {
+            return request(app).get('/api/articles/2/comments').expect(200)
+            .then(({ body }) => {
+                expect(body.comments).toEqual([]);
+            });
+        })
+    });
+});

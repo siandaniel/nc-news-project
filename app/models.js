@@ -19,18 +19,29 @@ const fetchArticles = () => {
     });
 };
 
+
 const fetchArticleById = (article_id) => {
     let sqlFetchArticleByIdQuery = `SELECT * FROM articles
                                     WHERE article_id = $1`
-
+    
     return db.query(sqlFetchArticleByIdQuery, [article_id]).then(({ rows, rowCount }) => {
         if (rowCount === 0) {
             return Promise.reject({ status: 404, msg: "Not found - no article of this ID in database" })
         }
         else {
-        return rows[0];
+            return rows[0];
         }
     });
 }
 
-module.exports = { fetchTopics, fetchArticles, fetchArticleById };
+const fetchCommentsById = (article_id) => {
+    let sqlFetchCommentsQuery = `SELECT * FROM comments
+                                WHERE article_id = $1
+                                ORDER BY created_at DESC`
+    
+    return db.query(sqlFetchCommentsQuery, [article_id]).then(({ rows }) => {
+        return rows;
+    });
+};
+
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById };
