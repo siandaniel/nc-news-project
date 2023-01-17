@@ -13,7 +13,7 @@ const fetchArticles = () => {
                                 LEFT JOIN comments ON articles.article_id = comments.article_id
                                 GROUP BY articles.article_id
                                 ORDER BY articles.created_at DESC`
- 
+
     return db.query(sqlFetchArticlesQuery).then((result) => {
         return result.rows;
     });
@@ -23,7 +23,7 @@ const fetchArticles = () => {
 const fetchArticleById = (article_id) => {
     let sqlFetchArticleByIdQuery = `SELECT * FROM articles
                                     WHERE article_id = $1`
-    
+
     return db.query(sqlFetchArticleByIdQuery, [article_id]).then(({ rows, rowCount }) => {
         if (rowCount === 0) {
             return Promise.reject({ status: 404, msg: "Not found - no article of this ID in database" })
@@ -38,27 +38,51 @@ const fetchCommentsById = (article_id) => {
     let sqlFetchCommentsQuery = `SELECT * FROM comments
                                 WHERE article_id = $1
                                 ORDER BY created_at DESC`
-    
+
     return db.query(sqlFetchCommentsQuery, [article_id]).then(({ rows }) => {
         return rows;
     });
 };
 
+const addComment = (comment, article_id) => {
+    return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+        .then(({ rows, rowCount }) => {
+            if (rowCount === 0) {
+                return Promise.reject({ status: 404, msg: "Not found - no article of this ID in database" })
+            }
+            else {
+                const correctArticle = rows[0]
+                const formattedComment = [[comment.body, article_id, correctArticle.author]]
+
+                let sqlAddCommentString = format(`INSERT INTO comments
+                                    (body, article_id, author)
+                                    VALUES
+                                    %L
+                                    RETURNING *`, formattedComment)
+
+                return db.query(sqlAddCommentString)
+                    .then(({ rows }) => {
+                        return rows[0];
+                    });
+            }
+        });
+}
+
 const updateVotes = (body, article_id) => {
-     return db.query(`SELECT votes FROM articles WHERE article_id = $1`, [article_id])
-        .then(({ rows }) => {
-            let newVoteTotal = rows[0].votes + body.inc_votes;
-        
-            let sqlUpdateVotesQuery = `UPDATE articles
-                                        SET votes = $1
-                                        WHERE article_id = $2
-                                        RETURNING *`
-            
-            return db.query(sqlUpdateVotesQuery, [newVoteTotal, article_id])
-        })
-        .then(({ rows }) => {
-        return rows[0];
-    });
+    return db.query(`SELECT votes FROM articles WHERE article_id = $1`, [article_id])
+       .then(({ rows }) => {
+           let newVoteTotal = rows[0].votes + body.inc_votes;
+       
+           let sqlUpdateVotesQuery = `UPDATE articles
+                                       SET votes = $1
+                                       WHERE article_id = $2
+                                       RETURNING *`
+           
+           return db.query(sqlUpdateVotesQuery, [newVoteTotal, article_id])
+       })
+       .then(({ rows }) => {
+       return rows[0];
+   });
 };
 
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, updateVotes };
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes };
