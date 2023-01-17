@@ -21,7 +21,8 @@ const fetchArticles = () => {
 
 const fetchCommentsById = (article_id) => {
     let sqlFetchCommentsQuery = `SELECT * FROM comments
-                                WHERE article_id = $1`
+                                WHERE article_id = $1
+                                ORDER BY created_at DESC`
     
     return db.query(sqlFetchCommentsQuery, [article_id]).then(({ rows }) => {
         return rows;

@@ -174,5 +174,24 @@ describe("/api/articles/:article_id/comments", () => {
                 });
             });
         });
+        test("Only returns comments for the specified article ID", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                comments.forEach((comment) => {
+                    expect(comment.article_id).toBe(1)
+                });
+            });
+        });
+        test("Comment objects are sorted with most recent comments first", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(comments[0].comment_id).toBe(5);
+                expect(comments[1].comment_id).toBe(2);
+                expect(comments[comments.length-2].comment_id).toBe(4);
+                expect(comments[comments.length-1].comment_id).toBe(9);
+            });
+        });
     });
 });
