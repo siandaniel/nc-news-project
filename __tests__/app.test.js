@@ -318,12 +318,12 @@ describe("/api/articles/:article_id/comments", () => {
             return request(app).post('/api/articles/1/comments')
             .send({
                 body: "Mitch is cool",
-                username: "Sian"
+                username: "rogersop"
               })
             .expect(201)
             .then(({ body }) => {
                 expect(body.commentPosted).toHaveProperty("article_id", 1);
-                expect(body.commentPosted).toHaveProperty("author", "butter_bridge");
+                expect(body.commentPosted).toHaveProperty("author", "rogersop");
                 expect(body.commentPosted).toHaveProperty("body", "Mitch is cool");
                 expect(body.commentPosted).toHaveProperty("comment_id", 19);
                 expect(body.commentPosted).toHaveProperty("created_at");
@@ -334,7 +334,7 @@ describe("/api/articles/:article_id/comments", () => {
             return request(app).post('/api/articles/1/comments')
             .send({
                 body: "Mitch is cool",
-                username: "Sian"
+                username: "rogersop"
               })
             .expect(201)
             .then(() => {
@@ -350,7 +350,7 @@ describe("/api/articles/:article_id/comments", () => {
             return request(app).post('/api/articles/abc/comments')
             .send({
                 body: "Mitch is cool",
-                username: "Sian"
+                username: "rogersop"
               })
             .expect(400)
             .then(({ body }) => {
@@ -361,7 +361,7 @@ describe("/api/articles/:article_id/comments", () => {
             return request(app).post('/api/articles/392/comments')
             .send({
                 body: "Mitch is cool",
-                username: "Sian"
+                username: "rogersop"
               })
             .expect(404)
             .then(({ body }) => {

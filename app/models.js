@@ -46,13 +46,12 @@ const fetchCommentsById = (article_id) => {
 
 const addComment = (comment, article_id) => {
     return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
-        .then(({ rows, rowCount }) => {
+        .then(({ rowCount }) => {
             if (rowCount === 0) {
                 return Promise.reject({ status: 404, msg: "Not found - no article of this ID in database" })
             }
             else {
-                const correctArticle = rows[0]
-                const formattedComment = [[comment.body, article_id, correctArticle.author]]
+                const formattedComment = [[comment.body, article_id, comment.username]]
 
                 let sqlAddCommentString = format(`INSERT INTO comments
                                     (body, article_id, author)
