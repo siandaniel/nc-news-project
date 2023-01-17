@@ -12,6 +12,14 @@ afterAll(() => {
     return db.end();
 });
 
+describe("/non-existent-or-misspelt-endpoint", () => {
+    test("Returns 'Status: 404' and custom error message if endpoint is not found", () => {
+        return request(app).get('/invalid-or-misspelt-path').expect(404).then(({ body: { msg } }) => {
+            expect(msg).toBe("Path not found - please try again");
+        });
+    });
+});
+
 describe("/api/topics", () => {
     describe("GET", () => {
         test("Returns 'Status: 200' if no error in path", () => {
@@ -48,15 +56,6 @@ describe("/api/topics", () => {
                 expect(topics[1].slug).toBe("cats");
                 expect(topics[2].description).toBe("what books are made of");
                 expect(topics[2].slug).toBe("paper");
-            });
-        });
-        test("Returns 'Status: 404' if invalid path provided to topics, e.g. misspelt path", () => {
-            return request(app).get('/api/topisc').expect(404);
-        });
-        test("Returns custom error message if invalid path provided ", () => {
-            return request(app).get('/api/topisc').expect(404).then((body) => {
-                const errorMsg = body.error.text
-                expect(errorMsg).toBe("Invalid path provided - please try again");
             });
         });
     });
@@ -125,15 +124,6 @@ describe("/api/articles", () => {
                 expect(articles[0]).toHaveProperty("comment_count", '2');
             });
         });
-        test("Returns 'Status: 404' if invalid path provided to articles, e.g. misspelt path", () => {
-            return request(app).get('/api/articlees').expect(404);
-        });
-        test("Returns custom error message if invalid path provided ", () => {
-            return request(app).get('/api/articlees').expect(404).then((body) => {
-                const errorMsg = body.error.text
-                expect(errorMsg).toBe("Invalid path provided - please try again");
-            });
-        });
     });
 });
 
@@ -195,12 +185,6 @@ describe("/api/articles/:article_id", () => {
                 const articleC = body.requestedArticle;
                 expect(articleC).toHaveProperty("article_id", 12);
             })
-        });
-        test("Returns 'Status: 404' with custom error message if invalid endpoint provided e.g. misspelt path", () => {
-            return request(app).get('/api/articlees/1').expect(404).then((body) => {
-                const errorMsg = body.error.text
-                expect(errorMsg).toBe("Invalid path provided - please try again");
-            });
         });
     });
 });

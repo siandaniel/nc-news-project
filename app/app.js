@@ -9,8 +9,8 @@ app.get('/api/articles', getArticles);
 
 app.get('/api/articles/:article_id', getArticleById);
 
-app.get(`*`, (request, response) => {
-    response.status(404).send("Invalid path provided - please try again")
-});
+app.use((request, response, next) => {
+    response.status(404).send({ msg: 'Path not found - please try again' })
+})
 
 module.exports = app;
