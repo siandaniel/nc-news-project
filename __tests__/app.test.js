@@ -192,6 +192,25 @@ describe("/api/articles/:article_id", () => {
             });
         });
     });
+    describe("PATCH", () => {
+        test("Returns 'Status: 204' with empty object if sent empty request body", () => {
+            return request(app).patch('/api/articles/1')
+            .send()
+            .expect(204)
+            .then(({ body }) => {
+                expect(body).toEqual({})
+            });
+        });
+        test("Returns 'Status: 200' with an article object", () => {
+            return request(app).patch('/api/articles/1')
+            .send({ inc_votes: 1 })
+            .expect(200)
+            .then(({ body }) => {
+                expect(typeof body.updatedArticle).toBe("object");
+                expect(Array.isArray(body.updatedArticle)).toBe(false)
+            });
+        });
+    });
 });
 
 describe("/api/articles/:article_id/comments", () => {

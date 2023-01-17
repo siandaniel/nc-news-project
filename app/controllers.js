@@ -37,4 +37,16 @@ const getComments = (request, response, next) => {
     })
 };
 
-module.exports = { getTopics, getArticles, getArticleById, getComments };
+const updateArticle = (request, response, next) => {
+    const { body } = request;
+    const { article_id } = request.params;
+
+    if (Object.keys(body).length > 0) {
+            response.status(200).send({ updatedArticle: {} });
+    }
+    else {
+        response.status(204).send();
+    }
+};
+
+module.exports = { getTopics, getArticles, getArticleById, getComments, updateArticle };
