@@ -12,6 +12,19 @@ afterAll(() => {
     return db.end();
 });
 
+describe("/non-existent-or-misspelt-endpoint", () => {
+    describe("ALL REQUESTS", () => {
+        test("Returns 'Status: 404' and custom error message if endpoint is not found", () => {
+            return request(app)
+            .get('/invalid-or-misspelt-path')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - this path does not exist");
+            });
+        });
+    });
+});
+
 describe("/api/topics", () => {
     describe("GET", () => {
         test("Returns 'Status: 200' if no error in path", () => {
@@ -48,15 +61,6 @@ describe("/api/topics", () => {
                 expect(topics[1].slug).toBe("cats");
                 expect(topics[2].description).toBe("what books are made of");
                 expect(topics[2].slug).toBe("paper");
-            });
-        });
-        test("Returns 'Status: 404' if invalid path provided to topics, e.g. misspelt path", () => {
-            return request(app).get('/api/topisc').expect(404);
-        });
-        test("Returns custom error message if invalid path provided ", () => {
-            return request(app).get('/api/topisc').expect(404).then((body) => {
-                const errorMsg = body.error.text
-                expect(errorMsg).toBe("Invalid path provided - please try again");
             });
         });
     });
@@ -125,13 +129,66 @@ describe("/api/articles", () => {
                 expect(articles[0]).toHaveProperty("comment_count", '2');
             });
         });
-        test("Returns 'Status: 404' if invalid path provided to articles, e.g. misspelt path", () => {
-            return request(app).get('/api/articlees').expect(404);
+    });
+});
+
+describe("/api/articles/:article_id", () => {
+    describe("GET", () => {
+        test("Returns 'Status: 200' with single article object if valid article ID", () => {
+            return request(app).get('/api/articles/1').expect(200)
+            .then(({ body }) => {
+                const article = body.requestedArticle;
+                expect(typeof article).toBe("object");
+                expect(Array.isArray(article)).toBe(false);
+            });
         });
-        test("Returns custom error message if invalid path provided ", () => {
-            return request(app).get('/api/articlees').expect(404).then((body) => {
-                const errorMsg = body.error.text
-                expect(errorMsg).toBe("Invalid path provided - please try again");
+        test("Returns an article object containing the correct keys", () => {
+            return request(app).get('/api/articles/1').expect(200)
+            .then(({ body }) => {
+                const article = body.requestedArticle;
+                expect(article).toHaveProperty("author", expect.any(String));
+                expect(article).toHaveProperty("title", expect.any(String));
+                expect(article).toHaveProperty("article_id", expect.any(Number));
+                expect(article).toHaveProperty("body", expect.any(String));
+                expect(article).toHaveProperty("topic", expect.any(String));
+                expect(article).toHaveProperty("created_at", expect.any(String));
+                expect(article).toHaveProperty("votes", expect.any(Number));
+                expect(article).toHaveProperty("article_img_url", expect.any(String));
+            });
+        });
+        test("Returns the correct article object for article ID 1", () => {
+            return request(app).get('/api/articles/1').expect(200)
+            .then(({ body }) => {
+                const article = body.requestedArticle;
+                expect(article).toEqual({
+                    author: "butter_bridge",
+                    article_id: 1,
+                    body: "I find this existence challenging",
+                    topic: "mitch",
+                    created_at: "2020-07-09T20:11:00.000Z",
+                    title: "Living in the shadow of a great man",
+                    votes: 100,
+                    article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+                });
+            });
+        });
+        test("Returns the correct article object for other valid article IDs", () => {
+            return request(app).get('/api/articles/2').expect(200)
+            .then(({ body }) => {
+                const article = body.requestedArticle;
+                expect(article).toHaveProperty("article_id", 2);
+            });
+        });
+        test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
+            return request(app).get('/api/articles/abc').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
+            return request(app).get('/api/articles/392').expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no article of this ID in database");
             });
         });
     });
