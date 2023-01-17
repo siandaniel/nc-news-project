@@ -285,7 +285,6 @@ describe("/api/articles/:article_id/comments", () => {
               })
             .expect(201)
             .then(({ body }) => {
-                console.log(body.commentPosted)
                 expect(body.commentPosted).toHaveProperty("article_id", 1);
                 expect(body.commentPosted).toHaveProperty("author", "butter_bridge");
                 expect(body.commentPosted).toHaveProperty("body", "Mitch is cool");
@@ -293,6 +292,22 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(body.commentPosted).toHaveProperty("created_at");
                 expect(body.commentPosted).toHaveProperty("votes", 0);
             });
+        });
+        test("Comments database is updated with the new comment", () => {
+            return request(app).post('/api/articles/1/comments')
+            .send({
+                body: "Mitch is cool",
+                username: "Sian"
+              })
+            .expect(201)
+            .then(() => {
+                return db.query('SELECT * FROM comments;')
+            })
+            .then(({rows}) => {
+                expect(rows.length).toBe(19)
+                expect(rows[rows.length-1].comment_id).toBe(19);
+                expect(rows[rows.length-1].body).toBe("Mitch is cool");
+            })
         });
     });
 });

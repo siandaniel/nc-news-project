@@ -58,8 +58,8 @@ const addComment = (comment, article_id) => {
                                 RETURNING *`, formattedComment)
 
         return db.query(sqlAddCommentString)
-        .then((result) => {
-            return result.rows[0];
+        .then(({ rows }) => {
+            return rows[0];
     })
 
 
