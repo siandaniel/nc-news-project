@@ -109,10 +109,7 @@ describe("/api/articles", () => {
             return request(app).get('/api/articles').expect(200)
             .then(({ body }) => {
                 const articles = body.articles;
-                expect(articles[0].article_id).toBe(3);
-                expect(articles[1].article_id).toBe(6);
-                expect(articles[articles.length-2].article_id).toBe(11);
-                expect(articles[articles.length-1].article_id).toBe(7);
+                expect(articles).toBeSortedBy('created_at', { descending: true })
             });
         });
         test("Correct values are inputted to article object keys", () => {
