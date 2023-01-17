@@ -156,5 +156,23 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(comments.length).toBe(11);
             });
         });
+        test("Each comment object contains the correct keys", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                comments.forEach((comment) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                            article_id: expect.any(Number)
+                        })
+                    )
+                });
+            });
+        });
     });
 });
