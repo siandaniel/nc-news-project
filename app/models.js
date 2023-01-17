@@ -44,4 +44,26 @@ const fetchCommentsById = (article_id) => {
     });
 };
 
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById };
+const addComment = (comment, article_id) => {
+
+    return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+    .then(({ rows }) => {
+        const correctArticle = rows[0]
+        const formattedComment = [[comment.body, article_id, correctArticle.author]]
+    
+        let sqlAddCommentString = format(`INSERT INTO comments
+                                (body, article_id, author)
+                                VALUES
+                                %L
+                                RETURNING *`, formattedComment)
+
+        return db.query(sqlAddCommentString)
+        .then((result) => {
+            return result.rows[0];
+    })
+
+
+    })
+}
+
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment };

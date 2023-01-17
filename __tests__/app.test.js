@@ -268,4 +268,31 @@ describe("/api/articles/:article_id/comments", () => {
             });
         })
     });
+    describe("POST", () => {
+        test("Returns 'Status: 201' with empty object if sent empty request body", () => {
+            return request(app).post('/api/articles/1/comments')
+            .send()
+            .expect(201)
+            .then(({ body }) => {
+                expect(body).toEqual({})
+            });
+        });
+        test("Returns 'Status: 201' with the comment object that has been added", () => {
+            return request(app).post('/api/articles/1/comments')
+            .send({
+                body: "Mitch is cool",
+                username: "Sian"
+              })
+            .expect(201)
+            .then(({ body }) => {
+                console.log(body.commentPosted)
+                expect(body.commentPosted).toHaveProperty("article_id", 1);
+                expect(body.commentPosted).toHaveProperty("author", "butter_bridge");
+                expect(body.commentPosted).toHaveProperty("body", "Mitch is cool");
+                expect(body.commentPosted).toHaveProperty("comment_id", 19);
+                expect(body.commentPosted).toHaveProperty("created_at");
+                expect(body.commentPosted).toHaveProperty("votes", 0);
+            });
+        });
+    });
 });
