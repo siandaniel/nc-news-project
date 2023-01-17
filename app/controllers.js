@@ -20,7 +20,7 @@ const getArticles = (request, response, next) => {
 
 
 const getComments = (request, response, next) => {
-    response.status(200).send()
+    response.status(200).send({ comments: ['hi'] })
 }
 
 module.exports = { getTopics, getArticles, getComments };

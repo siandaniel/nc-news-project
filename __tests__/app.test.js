@@ -142,5 +142,12 @@ describe("/api/articles/:article_id/comments", () => {
         test("Returns 'Status: 200' if no error in path", () => {
             return request(app).get('/api/articles/1/comments').expect(200)
         });
+        test("Returns comment objects contained inside an array", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(Array.isArray(comments)).toBe(true);
+            });
+        });
     });
 });
