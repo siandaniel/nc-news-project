@@ -2,13 +2,13 @@ const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById } = requ
 
 const getTopics = (request, response, next) => {
     fetchTopics().then((topics) => {
-        response.status(200).send({ topics: topics});       
+        response.status(200).send({ topics});       
     })
 };
 
 const getArticles = (request, response, next) => {
     fetchArticles().then((articles) => {
-        response.status(200).send({ articles: articles });       
+        response.status(200).send({ articles });       
     });
 };
 
@@ -30,7 +30,7 @@ const getComments = (request, response, next) => {
         return fetchCommentsById(article_id)
     })
     .then((comments) => {
-        response.status(200).send({ comments: comments })
+        response.status(200).send({ comments })
     })
     .catch((error) => {
         next(error)

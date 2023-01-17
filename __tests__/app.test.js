@@ -267,7 +267,7 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(body.msg).toBe("Not found - no article of this ID in database");
             });
         });
-        test("Returns 'Status: 200' and empty array for article IDs with no comments, without invoking error handler", () => {
+        test("Returns 'Status: 200' and empty array for existing article IDs with no comments, without invoking error handler", () => {
             return request(app).get('/api/articles/2/comments').expect(200)
             .then(({ body }) => {
                 expect(body.comments).toEqual([]);
