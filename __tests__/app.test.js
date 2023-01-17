@@ -160,14 +160,16 @@ describe("/api/articles/:article_id", () => {
             return request(app).get('/api/articles/1').expect(200)
             .then(({ body }) => {
                 const article = body.requestedArticle;
-                expect(article).toHaveProperty("author", "butter_bridge");
-                expect(article).toHaveProperty("title", "Living in the shadow of a great man");
-                expect(article).toHaveProperty("article_id", 1);
-                expect(article).toHaveProperty("body", "I find this existence challenging");
-                expect(article).toHaveProperty("topic", "mitch");
-                expect(article).toHaveProperty("created_at", "2020-07-09T20:11:00.000Z");
-                expect(article).toHaveProperty("votes", 100);
-                expect(article).toHaveProperty("article_img_url", "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700");
+                expect(article).toEqual({
+                    author: "butter_bridge",
+                    article_id: 1,
+                    body: "I find this existence challenging",
+                    topic: "mitch",
+                    created_at: "2020-07-09T20:11:00.000Z",
+                    title: "Living in the shadow of a great man",
+                    votes: 100,
+                    article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+                });
             });
         });
         test("Returns the correct article object for other valid article IDs", () => {
