@@ -19,4 +19,13 @@ const fetchArticles = () => {
     });
 };
 
-module.exports = { fetchTopics, fetchArticles };
+const fetchCommentsById = (article_id) => {
+    let sqlFetchCommentsQuery = `SELECT * FROM comments
+                                WHERE article_id = $1`
+    
+    return db.query(sqlFetchCommentsQuery, [article_id]).then(({ rows }) => {
+        return rows;
+    });
+};
+
+module.exports = { fetchTopics, fetchArticles, fetchCommentsById };

@@ -149,5 +149,12 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(Array.isArray(comments)).toBe(true);
             });
         });
+        test("Returns correct number of comment objects for the article ID", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(comments.length).toBe(11);
+            });
+        });
     });
 });
