@@ -13,9 +13,14 @@ afterAll(() => {
 });
 
 describe("/non-existent-or-misspelt-endpoint", () => {
-    test("Returns 'Status: 404' and custom error message if endpoint is not found", () => {
-        return request(app).get('/invalid-or-misspelt-path').expect(404).then(({ body: { msg } }) => {
-            expect(msg).toBe("Path not found - please try again");
+    describe("ALL REQUESTS", () => {
+        test("Returns 'Status: 404' and custom error message if endpoint is not found", () => {
+            return request(app)
+            .get('/invalid-or-misspelt-path')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - this path does not exist");
+            });
         });
     });
 });
@@ -172,19 +177,25 @@ describe("/api/articles/:article_id", () => {
                 expect(articleA).toHaveProperty("article_id", 2);
             })
             .then(() => {
-                return request(app).get('/api/articles/3').expect(200)
-            })
-            .then(({ body }) => {
-                const articleB = body.requestedArticle;
-                expect(articleB).toHaveProperty("article_id", 3);
-            })
-            .then(() => {
                 return request(app).get('/api/articles/12').expect(200)
             })
             .then(({ body }) => {
                 const articleC = body.requestedArticle;
                 expect(articleC).toHaveProperty("article_id", 12);
-            })
+            });
+        });
+        test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
+            return request(app).get('/api/articles/abc').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
+            return request(app).get('/api/articles/392').expect(404)
+            .then(({ body }) => {
+                console.log(body)
+                expect(body.msg).toBe("Not found - no article of this ID in database");
+            });
         });
     });
 });
