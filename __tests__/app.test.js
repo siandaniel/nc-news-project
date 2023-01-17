@@ -109,10 +109,7 @@ describe("/api/articles", () => {
             return request(app).get('/api/articles').expect(200)
             .then(({ body }) => {
                 const articles = body.articles;
-                expect(articles[0].article_id).toBe(3);
-                expect(articles[1].article_id).toBe(6);
-                expect(articles[articles.length-2].article_id).toBe(11);
-                expect(articles[articles.length-1].article_id).toBe(7);
+                expect(articles).toBeSortedBy('created_at', { descending: true })
             });
         });
         test("Correct values are inputted to article object keys", () => {
@@ -196,10 +193,7 @@ describe("/api/articles/:article_id", () => {
 
 describe("/api/articles/:article_id/comments", () => {
     describe("GET", () => {
-        test("Returns 'Status: 200' if no error in path", () => {
-            return request(app).get('/api/articles/1/comments').expect(200)
-        });
-        test("Returns comment objects contained inside an array", () => {
+        test("Returns 'Status: 200' with comment objects contained inside an array", () => {
             return request(app).get('/api/articles/1/comments').expect(200)
             .then(({ body }) => {
                 const comments = body.comments;
@@ -273,5 +267,70 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(body.comments).toEqual([]);
             });
         })
+    });
+
+    describe("POST", () => {
+        test("Returns 'Status: 204' with empty object if sent empty request body", () => {
+            return request(app).post('/api/articles/1/comments')
+            .send()
+            .expect(204)
+            .then(({ body }) => {
+                expect(body).toEqual({})
+            });
+        });
+        test("Returns 'Status: 201' with the comment object that has been added", () => {
+            return request(app).post('/api/articles/1/comments')
+            .send({
+                body: "Mitch is cool",
+                username: "Sian"
+              })
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.commentPosted).toHaveProperty("article_id", 1);
+                expect(body.commentPosted).toHaveProperty("author", "butter_bridge");
+                expect(body.commentPosted).toHaveProperty("body", "Mitch is cool");
+                expect(body.commentPosted).toHaveProperty("comment_id", 19);
+                expect(body.commentPosted).toHaveProperty("created_at");
+                expect(body.commentPosted).toHaveProperty("votes", 0);
+            });
+        });
+        test("Comments database is updated with the new comment", () => {
+            return request(app).post('/api/articles/1/comments')
+            .send({
+                body: "Mitch is cool",
+                username: "Sian"
+              })
+            .expect(201)
+            .then(() => {
+                return db.query('SELECT * FROM comments;')
+            })
+            .then(({rows}) => {
+                expect(rows.length).toBe(19)
+                expect(rows[rows.length-1].comment_id).toBe(19);
+                expect(rows[rows.length-1].body).toBe("Mitch is cool");
+            })
+        });
+        test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
+            return request(app).post('/api/articles/abc/comments')
+            .send({
+                body: "Mitch is cool",
+                username: "Sian"
+              })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
+            return request(app).post('/api/articles/392/comments')
+            .send({
+                body: "Mitch is cool",
+                username: "Sian"
+              })
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no article of this ID in database");
+            });
+        });
     });
 });
