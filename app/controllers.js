@@ -24,9 +24,17 @@ const getArticleById = (request, response, next) => {
 
 const getComments = (request, response, next) => {
     const { article_id } = request.params;
-    fetchCommentsById(article_id).then((comments) => {
+
+    fetchArticleById(article_id)
+    .then(() => {
+        return fetchCommentsById(article_id)
+    })
+    .then((comments) => {
         response.status(200).send({ comments: comments })
-    });
+    })
+    .catch((error) => {
+        next(error)
+    })
 };
 
 module.exports = { getTopics, getArticles, getArticleById, getComments };

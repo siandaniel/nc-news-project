@@ -22,7 +22,7 @@ const fetchArticles = () => {
 
 const fetchArticleById = (article_id) => {
     let sqlFetchArticleByIdQuery = `SELECT * FROM articles
-    WHERE article_id = $1`
+                                    WHERE article_id = $1`
     
     return db.query(sqlFetchArticleByIdQuery, [article_id]).then(({ rows, rowCount }) => {
         if (rowCount === 0) {

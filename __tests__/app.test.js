@@ -255,5 +255,23 @@ describe("/api/articles/:article_id/comments", () => {
                 });
             });
         });
+        test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
+            return request(app).get('/api/articles/abc/comments').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
+            return request(app).get('/api/articles/392/comments').expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no article of this ID in database");
+            });
+        });
+        test("Returns 'Status: 200' and empty array for article IDs with no comments, without invoking error handler", () => {
+            return request(app).get('/api/articles/2/comments').expect(200)
+            .then(({ body }) => {
+                expect(body.comments).toEqual([]);
+            });
+        })
     });
 });
