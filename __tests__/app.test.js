@@ -210,6 +210,23 @@ describe("/api/articles/:article_id", () => {
                 expect(Array.isArray(body.updatedArticle)).toBe(false)
             });
         });
+        test("Returned correct article object for ID with expected keys", () => {
+            return request(app).patch('/api/articles/1')
+            .send({ inc_votes: 1 })
+            .expect(200)
+            .then(({ body }) => {
+                const updatedArticle = body.updatedArticle;
+                console.log(updatedArticle)
+                expect(updatedArticle).toHaveProperty("article_id", 1)
+                expect(updatedArticle).toHaveProperty("title")
+                expect(updatedArticle).toHaveProperty("topic")
+                expect(updatedArticle).toHaveProperty("author")
+                expect(updatedArticle).toHaveProperty("body")
+                expect(updatedArticle).toHaveProperty("created_at")
+                expect(updatedArticle).toHaveProperty("votes")
+                expect(updatedArticle).toHaveProperty("article_img_url")
+            });
+        });
     });
 });
 

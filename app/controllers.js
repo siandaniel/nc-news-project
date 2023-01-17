@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById } = require('./models.js')
+const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, updateVotes } = require('./models.js')
 
 const getTopics = (request, response, next) => {
     fetchTopics().then((topics) => {
@@ -42,7 +42,9 @@ const updateArticle = (request, response, next) => {
     const { article_id } = request.params;
 
     if (Object.keys(body).length > 0) {
-            response.status(200).send({ updatedArticle: {} });
+        updateVotes(body, article_id).then((article) => {
+            response.status(200).send({ updatedArticle: article });
+        })
     }
     else {
         response.status(204).send();

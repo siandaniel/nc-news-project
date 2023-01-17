@@ -44,4 +44,21 @@ const fetchCommentsById = (article_id) => {
     });
 };
 
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById };
+const updateVotes = (body, article_id) => {
+     return db.query(`SELECT votes FROM articles WHERE article_id = $1`, [article_id])
+        .then(({ rows }) => {
+            let newVoteTotal = rows[0].votes + body.inc_votes;
+        
+            let sqlUpdateVotesQuery = `UPDATE articles
+                                        SET votes = $1
+                                        WHERE article_id = $2
+                                        RETURNING *`
+            
+            return db.query(sqlUpdateVotesQuery, [newVoteTotal, article_id])
+        })
+        .then(({ rows }) => {
+        return rows[0];
+    });
+};
+
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, updateVotes };
