@@ -268,11 +268,12 @@ describe("/api/articles/:article_id/comments", () => {
             });
         })
     });
+
     describe("POST", () => {
-        test("Returns 'Status: 201' with empty object if sent empty request body", () => {
+        test("Returns 'Status: 204' with empty object if sent empty request body", () => {
             return request(app).post('/api/articles/1/comments')
             .send()
-            .expect(201)
+            .expect(204)
             .then(({ body }) => {
                 expect(body).toEqual({})
             });
@@ -308,6 +309,28 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(rows[rows.length-1].comment_id).toBe(19);
                 expect(rows[rows.length-1].body).toBe("Mitch is cool");
             })
+        });
+        test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
+            return request(app).post('/api/articles/abc/comments')
+            .send({
+                body: "Mitch is cool",
+                username: "Sian"
+              })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
+            return request(app).post('/api/articles/392/comments')
+            .send({
+                body: "Mitch is cool",
+                username: "Sian"
+              })
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no article of this ID in database");
+            });
         });
     });
 });

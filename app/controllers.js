@@ -45,9 +45,12 @@ const postComment = (request, response, next) => {
         addComment(body, article_id).then((comment) => {
             response.status(201).send({ commentPosted: comment })
         })
+        .catch((error) => {
+            next(error)
+        })
     }
     else {
-        response.status(201).send()
+        response.status(204).send()
     }
 }
 
