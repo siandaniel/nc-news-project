@@ -12,4 +12,15 @@ const getArticles = (request, response, next) => {
         });
 };
 
-module.exports = { getTopics, getArticles };
+
+
+
+
+
+
+
+const getComments = (request, response, next) => {
+    response.status(200).send()
+}
+
+module.exports = { getTopics, getArticles, getComments };

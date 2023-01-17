@@ -136,3 +136,11 @@ describe("/api/articles", () => {
         });
     });
 });
+
+describe("/api/articles/:article_id/comments", () => {
+    describe("GET", () => {
+        test("Returns 'Status: 200' if no error in path", () => {
+            return request(app).get('/api/articles/1/comments').expect(200)
+        });
+    });
+});
