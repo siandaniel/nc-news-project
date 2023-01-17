@@ -188,7 +188,6 @@ describe("/api/articles/:article_id", () => {
         test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
             return request(app).get('/api/articles/392').expect(404)
             .then(({ body }) => {
-                console.log(body)
                 expect(body.msg).toBe("Not found - no article of this ID in database");
             });
         });
