@@ -7,9 +7,9 @@ const getTopics = (request, response, next) => {
 };
 
 const getArticles = (request, response, next) => {
-    const { topic } = request.query
+    const { topic, sort_by } = request.query
 
-    fetchArticles(topic).then((articles) => {
+    fetchArticles(topic, sort_by).then((articles) => {
         response.status(200).send({ articles });       
     })
     .catch((error) => {

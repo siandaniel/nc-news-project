@@ -7,14 +7,14 @@ const fetchTopics = () => {
     });
 };
 
-const fetchArticles = (topic) => {
+const fetchArticles = (topic, sort_by='created_at') => {
     const queriesArr = [];
     let sqlFetchArticlesQuery = `SELECT articles.*, COUNT(comments.article_id) AS comment_count 
                                 FROM articles
                                 LEFT JOIN comments ON articles.article_id = comments.article_id`
     
     if (topic !== undefined) {
-        if (!['mitch', 'cats'].includes(topic.toLowerCase())) {
+        if (!['mitch', 'cats', 'paper'].includes(topic.toLowerCase())) {
             return Promise.reject({status: 400, msg: "Bad request - invalid topic name in query"})
         }
         else {
@@ -24,7 +24,7 @@ const fetchArticles = (topic) => {
     }
 
     sqlFetchArticlesQuery+= ` GROUP BY articles.article_id
-                            ORDER BY articles.created_at DESC`
+                            ORDER BY articles.${sort_by} DESC`
     
 
     return db.query(sqlFetchArticlesQuery, queriesArr).then((result) => {

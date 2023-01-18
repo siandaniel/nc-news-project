@@ -357,10 +357,23 @@ describe("GET: Queries", () => {
             expect(mitchArticles.length).toBe(11);
         })
     });
-    test("Topic query returns 'Status: 400' with error message if provided an invalid topic name", () => {
+    test("Topic query returns 'Status: 400' with 'Bad Request' error message if provided an invalid topic name", () => {
         return request(app).get('/api/articles?topic=123').expect(400)
         .then(({ body }) => {
             expect(body.msg).toBe("Bad request - invalid topic name in query");
+        });
+    });
+    test("Topic query returns 'Status: 200' with an empty array if valid topic but no articles", () => {
+        return request(app).get('/api/articles?topic=paper').expect(200)
+        .then(({ body }) => {
+            expect(body.articles).toEqual([]);
+        });
+    });
+    test("Sort_by query returns 'Status: 200' with articles sorted in the specified order", () => {
+        return request(app).get('/api/articles?sort_by=author').expect(200)
+        .then(({ body }) => {
+            const articles = body.articles;
+            expect(articles).toBeSortedBy('author', { descending: true })
         });
     });
 });
