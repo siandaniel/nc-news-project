@@ -334,3 +334,30 @@ describe("/api/articles/:article_id/comments", () => {
         });
     });
 });
+
+describe("/api/users", () => {
+    describe("GET", () => {
+        test("Returns 'Status: 200' with user objects contained in an array", () => {
+            return request(app).get('/api/users').expect(200)
+            .then(({ body }) => {
+                const users = body.users;
+                expect(Array.isArray(users)).toBe(true);
+            });
+        });
+        test("Each user object contains the keys 'username', 'name' and 'avatar_url'", () => {
+            return request(app).get('/api/users').expect(200)
+            .then(({ body }) => {
+                const users = body.users;
+                users.forEach((user) => {
+                    expect(user).toEqual(
+                        expect.objectContaining({
+                            username: expect.any(String),
+                            name: expect.any(String),
+                            avatar_url: expect.any(String)     
+                        })
+                    )
+                });
+            });
+        });
+    });
+});

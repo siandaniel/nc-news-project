@@ -54,4 +54,8 @@ const postComment = (request, response, next) => {
     }
 }
 
-module.exports = { getTopics, getArticles, getArticleById, getComments, postComment };
+const getUsers = (request, response, next) => {
+    response.status(200).send({ users: [] })
+};
+
+module.exports = { getTopics, getArticles, getArticleById, getComments, postComment, getUsers };
