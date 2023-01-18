@@ -14,12 +14,18 @@ const fetchArticles = (topic) => {
                                 LEFT JOIN comments ON articles.article_id = comments.article_id`
     
     if (topic !== undefined) {
+        if (!['mitch', 'cats'].includes(topic.toLowerCase())) {
+            return Promise.reject({status: 400, msg: "Bad request - invalid topic name in query"})
+        }
+        else {
         sqlFetchArticlesQuery+= ` WHERE articles.topic = $1`
         queriesArr.push(topic)
+        }
     }
 
     sqlFetchArticlesQuery+= ` GROUP BY articles.article_id
                             ORDER BY articles.created_at DESC`
+    
 
     return db.query(sqlFetchArticlesQuery, queriesArr).then((result) => {
         return result.rows;

@@ -357,4 +357,10 @@ describe("GET: Queries", () => {
             expect(mitchArticles.length).toBe(11);
         })
     });
+    test("Topic query returns 'Status: 400' with error message if provided an invalid topic name", () => {
+        return request(app).get('/api/articles?topic=123').expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad request - invalid topic name in query");
+        });
+    });
 });

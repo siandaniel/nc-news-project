@@ -11,6 +11,9 @@ const getArticles = (request, response, next) => {
 
     fetchArticles(topic).then((articles) => {
         response.status(200).send({ articles });       
+    })
+    .catch((error) => {
+        next(error)
     });
 };
 
