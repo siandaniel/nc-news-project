@@ -337,10 +337,24 @@ describe("/api/articles/:article_id/comments", () => {
 
 describe("GET: Queries", () => {
     test("Returns 'Status: 200' with ALL articles if no query specified", () => {
-        return request(app).get('/api/articles').expect(200)
+        return request(app).get('/api/articles?').expect(200)
         .then(({ body }) => {
             const articles = body.articles;
             expect(articles.length).toBe(12);
         });
+    });
+    test("Topic query returns 'Status: 200' with correct number of articles for a given topic", () => {
+        return request(app).get('/api/articles?topic=cats').expect(200)
+        .then(({ body }) => {
+            const catArticles = body.articles;
+            expect(catArticles.length).toBe(1);
+        })
+        .then(() => {
+            return request(app).get('/api/articles?topic=mitch').expect(200)
+        })
+        .then(({ body }) => {
+            const mitchArticles = body.articles;
+            expect(mitchArticles.length).toBe(11);
+        })
     });
 });
