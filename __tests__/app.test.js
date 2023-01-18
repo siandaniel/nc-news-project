@@ -179,7 +179,7 @@ describe("/api/articles/:article_id", () => {
         test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
             return request(app).get('/api/articles/abc').expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+                expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
         test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
@@ -238,7 +238,7 @@ describe("/api/articles/:article_id", () => {
             .send({ inc_votes: 2 })
             .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+                expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
         test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
@@ -262,7 +262,7 @@ describe("/api/articles/:article_id", () => {
             .send({ inc_votes: "abc" })
             .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request");
+                expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
     });
@@ -329,7 +329,7 @@ describe("/api/articles/:article_id/comments", () => {
         test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
             return request(app).get('/api/articles/abc/comments').expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+                expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
         test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
@@ -395,7 +395,7 @@ describe("/api/articles/:article_id/comments", () => {
               })
             .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+                expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
         test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {

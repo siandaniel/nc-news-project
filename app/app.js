@@ -32,7 +32,7 @@ app.use((error, request, response, next) => {
 
 app.use((error, request, response, next) => {
     if (error.code === '22P02') {
-        response.status(400).send({ msg: "Bad request - invalid data type for article ID" })
+        response.status(400).send({ msg: "Bad request - invalid data type" })
     }
     else {
         next(error)

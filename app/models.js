@@ -65,7 +65,7 @@ const addComment = (comment, article_id) => {
 const updateVotes = (body, article_id) => {
     return fetchArticleById(article_id)
         .then(() => {
-            if (!body.inc_votes || Object.keys(body).length === 0 || typeof body.inc_votes !== "number") {
+            if (!body.inc_votes || Object.keys(body).length === 0) {
                 return Promise.reject({ status: 400, msg: "Bad request" })
             }
 
