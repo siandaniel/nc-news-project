@@ -261,6 +261,22 @@ describe("/api/articles/:article_id", () => {
                 expect(body.msg).toBe("Not found - no article of this ID in database");
             });
         });
+        test("Returns 'Status: 400' and relevant error message if no 'inc_votes' property on request body", () => {
+            return request(app).patch('/api/articles/1')
+            .send({ change_votes: 2 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - body must have 'inc_votes' property of 'number' data type");
+            });
+        });
+        test("Returns 'Status: 400' and relevant error message if 'inc_votes' property is of incorrect data type", () => {
+            return request(app).patch('/api/articles/1')
+            .send({ inc_votes: "abc" })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - body must have 'inc_votes' property of 'number' data type");
+            });
+        });
     });
 });
 

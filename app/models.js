@@ -68,6 +68,9 @@ const updateVotes = (body, article_id) => {
             return db.query(`SELECT votes FROM articles WHERE article_id = $1`, [article_id])
         })
         .then(({ rows }) => {
+            if (!body.inc_votes || typeof body.inc_votes !== "number") {
+                return Promise.reject({ status: 400, msg: "Bad request - body must have 'inc_votes' property of 'number' data type" })
+            }
             let newVoteTotal = rows[0].votes + body.inc_votes;
 
             let sqlUpdateVotesQuery = `UPDATE articles
