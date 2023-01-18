@@ -45,30 +45,24 @@ const fetchCommentsById = (article_id) => {
 };
 
 const addComment = (comment, article_id) => {
-    return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
-        .then(({ rowCount }) => {
-            if (rowCount === 0) {
-                return Promise.reject({ status: 404, msg: "Not found - no article of this ID in database" })
-            }
-            else {
-                const formattedComment = [[comment.body, article_id, comment.username]]
+    return fetchArticleById(article_id)
+        .then(() => {
+            const formattedComment = [[comment.body, article_id, comment.username]]
 
-                let sqlAddCommentString = format(`INSERT INTO comments
+            let sqlAddCommentString = format(`INSERT INTO comments
                                     (body, article_id, author)
                                     VALUES
                                     %L
                                     RETURNING *`, formattedComment)
 
-                return db.query(sqlAddCommentString)
-                    .then(({ rows }) => {
-                        return rows[0];
-                    });
-            }
+            return db.query(sqlAddCommentString)
+        })
+        .then(({ rows }) => {
+            return rows[0];
         });
-}
+};
 
 const updateVotes = (body, article_id) => {
-
     return fetchArticleById(article_id)
         .then(() => {
             return db.query(`SELECT votes FROM articles WHERE article_id = $1`, [article_id])
