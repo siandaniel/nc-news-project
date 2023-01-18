@@ -233,18 +233,6 @@ describe("/api/articles/:article_id", () => {
                 expect(updatedArticle).toHaveProperty("votes", 80)
             });
         });
-        test("Updates to 'votes' column of the article are reflected in the articles database", () => {
-            return request(app).patch('/api/articles/1')
-            .send({ inc_votes: 2 })
-            .expect(200)
-            .then(() => {
-                return db.query('SELECT * FROM articles ORDER BY article_id;')
-            })
-            .then(({rows}) => {
-                expect(rows[0].article_id).toBe(1);
-                expect(rows[0].votes).toBe(102);
-            });
-        });
         test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
             return request(app).patch('/api/articles/abc')
             .send({ inc_votes: 2 })

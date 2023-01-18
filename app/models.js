@@ -65,20 +65,16 @@ const addComment = (comment, article_id) => {
 const updateVotes = (body, article_id) => {
     return fetchArticleById(article_id)
         .then(() => {
-            return db.query(`SELECT votes FROM articles WHERE article_id = $1`, [article_id])
-        })
-        .then(({ rows }) => {
             if (!body.inc_votes || typeof body.inc_votes !== "number") {
                 return Promise.reject({ status: 400, msg: "Bad request - body must have 'inc_votes' property of 'number' data type" })
             }
-            let newVoteTotal = rows[0].votes + body.inc_votes;
 
             let sqlUpdateVotesQuery = `UPDATE articles
-                                       SET votes = $1
+                                       SET votes = votes + $1
                                        WHERE article_id = $2
                                        RETURNING *`
 
-            return db.query(sqlUpdateVotesQuery, [newVoteTotal, article_id])
+            return db.query(sqlUpdateVotesQuery, [body.inc_votes, article_id])
         })
         .then(({ rows }) => {
             return rows[0];
