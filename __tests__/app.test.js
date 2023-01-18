@@ -334,3 +334,13 @@ describe("/api/articles/:article_id/comments", () => {
         });
     });
 });
+
+describe("GET: Queries", () => {
+    test("Returns 'Status: 200' with ALL articles if no query specified", () => {
+        return request(app).get('/api/articles').expect(200)
+        .then(({ body }) => {
+            const articles = body.articles;
+            expect(articles.length).toBe(12);
+        });
+    });
+});
