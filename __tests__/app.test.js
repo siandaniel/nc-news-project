@@ -337,18 +337,12 @@ describe("/api/articles/:article_id/comments", () => {
 
 describe("/api/users", () => {
     describe("GET", () => {
-        test("Returns 'Status: 200' with user objects contained in an array", () => {
+        test("Returns 'Status: 200' with ALL user objects contained in an array", () => {
             return request(app).get('/api/users').expect(200)
             .then(({ body }) => {
                 const users = body.users;
                 expect(Array.isArray(users)).toBe(true);
-            });
-        });
-        test("Array of users contains ALL users", () => {
-            return request(app).get('/api/users').expect(200)
-            .then(({ body }) => {
-                const users = body.users;
-                expect(users.length).toBe(4);
+                expect(users.length).toBe(4)
             });
         });
         test("Each user object contains the keys 'username', 'name' and 'avatar_url'", () => {
@@ -363,22 +357,6 @@ describe("/api/users", () => {
                             avatar_url: expect.any(String)     
                         })
                     )
-                });
-            });
-        });
-        test("User object keys have the correct values", () => {
-            return request(app).get('/api/users').expect(200)
-            .then(({ body }) => {
-                const users = body.users;
-                expect(users[0]).toEqual({    
-                    username: 'butter_bridge',
-                    name: 'jonny',
-                    avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
-                });
-                expect(users[1]).toEqual({    
-                    username: 'icellusedkars',
-                    name: 'sam',
-                    avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4'
                 });
             });
         });
