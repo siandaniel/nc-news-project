@@ -243,8 +243,24 @@ describe("/api/articles/:article_id", () => {
             .then(({rows}) => {
                 expect(rows[0].article_id).toBe(1);
                 expect(rows[0].votes).toBe(102);
-            })
-        })
+            });
+        });
+        test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
+            return request(app).patch('/api/articles/abc')
+            .send({ inc_votes: 2 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
+            return request(app).patch('/api/articles/392')
+            .send({ inc_votes: 2 })
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no article of this ID in database");
+            });
+        });
     });
 });
 

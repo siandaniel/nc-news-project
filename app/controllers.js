@@ -62,6 +62,9 @@ const updateArticle = (request, response, next) => {
         updateVotes(body, article_id).then((article) => {
             response.status(200).send({ updatedArticle: article });
         })
+        .catch((error) => {
+            next(error)
+        })
     }
     else {
         response.status(204).send();
