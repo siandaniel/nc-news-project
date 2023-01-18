@@ -254,7 +254,7 @@ describe("/api/articles/:article_id", () => {
             .send({ change_votes: 2 })
             .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request - body must have 'inc_votes' property of 'number' data type");
+                expect(body.msg).toBe("Bad request");
             });
         });
         test("Returns 'Status: 400' and relevant error message if 'inc_votes' property is of incorrect data type", () => {
@@ -262,7 +262,7 @@ describe("/api/articles/:article_id", () => {
             .send({ inc_votes: "abc" })
             .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request - body must have 'inc_votes' property of 'number' data type");
+                expect(body.msg).toBe("Bad request");
             });
         });
     });

@@ -66,7 +66,7 @@ const updateVotes = (body, article_id) => {
     return fetchArticleById(article_id)
         .then(() => {
             if (!body.inc_votes || typeof body.inc_votes !== "number") {
-                return Promise.reject({ status: 400, msg: "Bad request - body must have 'inc_votes' property of 'number' data type" })
+                return Promise.reject({ status: 400, msg: "Bad request" })
             }
 
             let sqlUpdateVotesQuery = `UPDATE articles
