@@ -190,12 +190,12 @@ describe("/api/articles/:article_id", () => {
         });
     });
     describe("PATCH", () => {
-        test("Returns 'Status: 204' with empty object if sent empty request body", () => {
+        test("Returns 'Status: 400' with 'Bad request' error message if sent empty request body", () => {
             return request(app).patch('/api/articles/1')
             .send()
-            .expect(204)
+            .expect(400)
             .then(({ body }) => {
-                expect(body).toEqual({})
+                expect(body.msg).toBe("Bad request")
             });
         });
         test("Returns 'Status: 200' with an article object", () => {
@@ -249,7 +249,7 @@ describe("/api/articles/:article_id", () => {
                 expect(body.msg).toBe("Not found - no article of this ID in database");
             });
         });
-        test("Returns 'Status: 400' and relevant error message if no 'inc_votes' property on request body", () => {
+        test("Returns 'Status: 400' and 'Bad request' error message if no 'inc_votes' property on request body", () => {
             return request(app).patch('/api/articles/1')
             .send({ change_votes: 2 })
             .expect(400)
@@ -257,7 +257,7 @@ describe("/api/articles/:article_id", () => {
                 expect(body.msg).toBe("Bad request");
             });
         });
-        test("Returns 'Status: 400' and relevant error message if 'inc_votes' property is of incorrect data type", () => {
+        test("Returns 'Status: 400' and 'Bad request' error message if 'inc_votes' property is of incorrect data type", () => {
             return request(app).patch('/api/articles/1')
             .send({ inc_votes: "abc" })
             .expect(400)

@@ -58,17 +58,12 @@ const updateArticle = (request, response, next) => {
     const { body } = request;
     const { article_id } = request.params;
 
-    if (Object.keys(body).length > 0) {
         updateVotes(body, article_id).then((article) => {
             response.status(200).send({ updatedArticle: article });
         })
         .catch((error) => {
             next(error)
-        })
-    }
-    else {
-        response.status(204).send();
-    }
+        });
 };
 
 module.exports = { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle };
