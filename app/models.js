@@ -88,4 +88,11 @@ const fetchUsers = () => {
     });
 };
 
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers };
+const deleteCommentById = (comment_id) => {
+    const sqlDeleteCommentQuery = `DELETE FROM comments
+                                   WHERE comment_id = $1;`
+
+    return db.query(sqlDeleteCommentQuery, [comment_id])
+};
+
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById };

@@ -439,3 +439,27 @@ describe("/api/users", () => {
         });
     });
 });
+
+describe("/api/comments/:comment_id", () => {
+    describe("DELETE", () => {
+        test("Returns a status 204 with no content", () => {
+            return request(app).delete('/api/comments/1')
+            .expect(204)
+            .then(( { body }) => {
+                expect(body).toEqual({});
+            });
+        });
+        test("Database no longer contains the comment with the specified ID", () => {
+            return request(app).delete('/api/comments/1')
+            .expect(204)
+            .then(() => {
+                return db.query('SELECT * FROM comments;')
+            })
+            .then(({rows}) => {
+                rows.forEach((row) => {
+                    expect(row.comment_id).not.toBe(1);
+                });
+            });
+        });
+    });
+});
