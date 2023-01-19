@@ -179,13 +179,90 @@ describe("/api/articles/:article_id", () => {
         test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
             return request(app).get('/api/articles/abc').expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+                expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
         test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
             return request(app).get('/api/articles/392').expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("Not found - no article of this ID in database");
+            });
+        });
+    });
+    describe("PATCH", () => {
+        test("Returns 'Status: 400' with 'Bad request' error message if sent empty request body", () => {
+            return request(app).patch('/api/articles/1')
+            .send()
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request")
+            });
+        });
+        test("Returns 'Status: 200' with an article object", () => {
+            return request(app).patch('/api/articles/1')
+            .send({ inc_votes: 1 })
+            .expect(200)
+            .then(({ body }) => {
+                expect(typeof body.updatedArticle).toBe("object");
+                expect(Array.isArray(body.updatedArticle)).toBe(false)
+            });
+        });
+        test("Returns correct article object for ID with expected keys", () => {
+            return request(app).patch('/api/articles/1')
+            .send({ inc_votes: 1 })
+            .expect(200)
+            .then(({ body }) => {
+                const updatedArticle = body.updatedArticle;
+                expect(updatedArticle).toHaveProperty("article_id", 1)
+                expect(updatedArticle).toHaveProperty("title")
+                expect(updatedArticle).toHaveProperty("topic")
+                expect(updatedArticle).toHaveProperty("author")
+                expect(updatedArticle).toHaveProperty("body")
+                expect(updatedArticle).toHaveProperty("created_at")
+                expect(updatedArticle).toHaveProperty("votes")
+                expect(updatedArticle).toHaveProperty("article_img_url")
+            });
+        });
+        test("Returns article object with 'votes' key updated by correct amount, including by negative numbers", () => {
+            return request(app).patch('/api/articles/1')
+            .send({ inc_votes: -20 })
+            .expect(200)
+            .then(({ body }) => {
+                const updatedArticle = body.updatedArticle;
+                expect(updatedArticle).toHaveProperty("article_id", 1)
+                expect(updatedArticle).toHaveProperty("votes", 80)
+            });
+        });
+        test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
+            return request(app).patch('/api/articles/abc')
+            .send({ inc_votes: 2 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
+            return request(app).patch('/api/articles/392')
+            .send({ inc_votes: 2 })
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no article of this ID in database");
+            });
+        });
+        test("Returns 'Status: 400' and 'Bad request' error message if no 'inc_votes' property on request body", () => {
+            return request(app).patch('/api/articles/1')
+            .send({ change_votes: 2 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+        });
+        test("Returns 'Status: 400' and 'Bad request' error message if 'inc_votes' property is of incorrect data type", () => {
+            return request(app).patch('/api/articles/1')
+            .send({ inc_votes: "abc" })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
     });
@@ -252,7 +329,7 @@ describe("/api/articles/:article_id/comments", () => {
         test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
             return request(app).get('/api/articles/abc/comments').expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+                expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
         test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
@@ -282,12 +359,12 @@ describe("/api/articles/:article_id/comments", () => {
             return request(app).post('/api/articles/1/comments')
             .send({
                 body: "Mitch is cool",
-                username: "Sian"
+                username: "rogersop"
               })
             .expect(201)
             .then(({ body }) => {
                 expect(body.commentPosted).toHaveProperty("article_id", 1);
-                expect(body.commentPosted).toHaveProperty("author", "butter_bridge");
+                expect(body.commentPosted).toHaveProperty("author", "rogersop");
                 expect(body.commentPosted).toHaveProperty("body", "Mitch is cool");
                 expect(body.commentPosted).toHaveProperty("comment_id", 19);
                 expect(body.commentPosted).toHaveProperty("created_at");
@@ -298,7 +375,7 @@ describe("/api/articles/:article_id/comments", () => {
             return request(app).post('/api/articles/1/comments')
             .send({
                 body: "Mitch is cool",
-                username: "Sian"
+                username: "rogersop"
               })
             .expect(201)
             .then(() => {
@@ -314,18 +391,18 @@ describe("/api/articles/:article_id/comments", () => {
             return request(app).post('/api/articles/abc/comments')
             .send({
                 body: "Mitch is cool",
-                username: "Sian"
+                username: "rogersop"
               })
             .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request - invalid data type for article ID");
+                expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
         test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
             return request(app).post('/api/articles/392/comments')
             .send({
                 body: "Mitch is cool",
-                username: "Sian"
+                username: "rogersop"
               })
             .expect(404)
             .then(({ body }) => {
