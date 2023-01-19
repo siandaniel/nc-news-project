@@ -7,14 +7,32 @@ const fetchTopics = () => {
     });
 };
 
-const fetchArticles = () => {
+const fetchArticles = (topic, sort_by='created_at', order='desc') => {
+    const queriesArr = [];
     let sqlFetchArticlesQuery = `SELECT articles.*, COUNT(comments.article_id) AS comment_count 
                                 FROM articles
-                                LEFT JOIN comments ON articles.article_id = comments.article_id
-                                GROUP BY articles.article_id
-                                ORDER BY articles.created_at DESC`
+                                LEFT JOIN comments ON articles.article_id = comments.article_id`
+    
+    if (topic !== undefined) {
+        if (!['mitch', 'cats', 'paper'].includes(topic.toLowerCase())) {
+            return Promise.reject({status: 400, msg: "Bad request"})
+        }
+        else {
+        sqlFetchArticlesQuery+= ` WHERE articles.topic = $1`
+        queriesArr.push(topic)
+        }
+    }
 
-    return db.query(sqlFetchArticlesQuery).then((result) => {
+    if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url'].includes(sort_by.toLowerCase()) ||
+        !['asc', 'desc'].includes(order.toLowerCase())) {
+        return Promise.reject({status: 400, msg: "Bad request"})
+    }
+
+    sqlFetchArticlesQuery+= ` GROUP BY articles.article_id
+                            ORDER BY articles.${sort_by} ${order}`
+    
+
+    return db.query(sqlFetchArticlesQuery, queriesArr).then((result) => {
         return result.rows;
     });
 };

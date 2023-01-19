@@ -127,6 +127,74 @@ describe("/api/articles", () => {
             });
         });
     });
+    describe("GET: Queries", () => {
+        test("Returns 'Status: 200' with ALL articles if no query specified", () => {
+            return request(app).get('/api/articles?').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles.length).toBe(12);
+            });
+        });
+        test("Topic query returns 'Status: 200' with correct number of articles for a given topic", () => {
+            return request(app).get('/api/articles?topic=cats').expect(200)
+            .then(({ body }) => {
+                const catArticles = body.articles;
+                expect(catArticles.length).toBe(1);
+            })
+            .then(() => {
+                return request(app).get('/api/articles?topic=mitch').expect(200)
+            })
+            .then(({ body }) => {
+                const mitchArticles = body.articles;
+                expect(mitchArticles.length).toBe(11);
+            })
+        });
+        test("Topic query returns 'Status: 200' with an empty array if valid topic but no articles", () => {
+            return request(app).get('/api/articles?topic=paper').expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toEqual([]);
+            });
+        });
+        test("Topic query returns 'Status: 400' with 'Bad Request' error message if provided an invalid topic name", () => {
+            return request(app).get('/api/articles?topic=123').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+        });
+        test("Sort_by query returns 'Status: 200' with articles sorted by the specified column", () => {
+            return request(app).get('/api/articles?sort_by=author').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('author', { descending: true })
+            });
+        });
+        test("Sort_by query returns 'Status: 400' with 'Bad Request' error message if provided with invalid sort_by criteria", () => {
+            return request(app).get('/api/articles?sort_by=hello').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+        });
+        test("Order query returns 'Status: 200' with articles sorted in the specified order", () => {
+            return request(app).get('/api/articles?order=asc').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('created_at', { ascending: true })
+            });
+        });
+        test("Order query returns 'Status: 400' with 'Bad Request' error message if provided with invalid order criteria", () => {
+            return request(app).get('/api/articles?order=hello').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+        });
+        test("Sort_by and order default to 'date' and 'desc' respectively", () => {
+            return request(app).get('/api/articles').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('created_at', { descending: true })
+            });
+        });
+    });    
 });
 
 describe("/api/articles/:article_id", () => {
