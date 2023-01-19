@@ -178,13 +178,20 @@ describe("/api/articles", () => {
             return request(app).get('/api/articles?order=asc').expect(200)
             .then(({ body }) => {
                 const articles = body.articles;
-                expect(articles).toBeSortedBy('created_at', { descending: false })
+                expect(articles).toBeSortedBy('created_at', { ascending: true })
             });
         });
         test("Order query returns 'Status: 400' with 'Bad Request' error message if provided with invalid order criteria", () => {
             return request(app).get('/api/articles?order=hello').expect(400)
             .then(({ body }) => {
                 expect(body.msg).toBe("Bad request");
+            });
+        });
+        test("Sort_by and order default to 'date' and 'desc' respectively", () => {
+            return request(app).get('/api/articles').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('created_at', { descending: true })
             });
         });
     });    
