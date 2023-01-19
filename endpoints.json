@@ -1,27 +1,125 @@
 {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+    "description": "Responds with a JSON representation of all the available endpoints of the API"
   },
+
   "GET /api/topics": {
-    "description": "serves an array of all topics",
+    "description": "Reponds with an array of all article topics from the database",
     "queries": [],
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "topics": [
+        {
+          "slug": "football",
+          "description": "Footie!"
+        }
+      ]
     }
   },
+
+  "GET /api/users": {
+    "description": "Responds with an array of all users from the database",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "lurker123",
+          "name": "John",
+          "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+        }
+      ]
+    }
+  },
+
   "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "Responds with an array of all articles from the database",
+    "queries": [
+      "topic",
+      "sort_by",
+      "order"
+    ],
     "exampleResponse": {
       "articles": [
         {
+          "article_id": "1",
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
           "body": "Text from the article..",
-          "created_at": 1527695953341
+          "created_at": 1527695953341,
+          "votes": "5",
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         }
       ]
     }
+  },
+
+  "GET /api/articles/:article_id": {
+    "description": "Reponds with the article object with the given article ID",
+    "queries": [],
+    "exampleResponse": {
+      "article_id": "2",
+      "title": "Why female artists are on the rise again",
+      "topic": "music",
+      "author": "music_fan",
+      "body": "Text from the article..",
+      "created_at": 1527695953341,
+      "votes": "3",
+      "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+      }
+  },
+
+  "PATCH /api/articles/:article_id": {
+    "description": "Updates the votes on the given article and returns the article object",
+    "queries": [],
+    "acceptedRequestBody": { "inc_votes": "3" },
+    "exampleResponse": {
+      "article_id": "9",
+      "title": "Antarctic sea level rising at record levels",
+      "topic": "environment",
+      "author": "polar_bear",
+      "body": "Text from the article..",
+      "created_at": 1527695953341,
+      "votes": "4",
+      "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+      }
+  },
+
+  "GET /api/articles/:article_id/comments": {
+    "description": "Responds with an array of all comments for the article at the given ID",
+    "queries": [],
+    "exampleResponse": {
+      "articles": [
+        {
+          "article_id": "1",
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": 1527695953341,
+          "votes": "5",
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        }
+      ]
+    }
+  },
+
+  "POST /api/articles/:article_id/comments": {
+    "description": "Posts a new comment to article at the given article ID and responds with a posted comment object",
+    "queries": [],
+    "acceptedRequestBody": { "body": "Comment text", "username": "username"},
+    "exampleResponse": {
+          "article_id": "1",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "comment_id": "4",
+          "created_at": 1527695953341,
+          "votes": "9"
+    }
+  },
+
+  "DELETE /api/comments/:comment_id": {
+    "description": "Deletes comment with given comment ID and responds with 204 No Content status",
+    "queries": [],
+    "exampleResponse": {}
   }
 }

@@ -25,6 +25,35 @@ describe("/non-existent-or-misspelt-endpoint", () => {
     });
 });
 
+describe("/api", () => {
+    describe("GET", () => {
+        test("Returns 'Status: 200' with a JSON endpoints object", () => {
+            return request(app).get('/api').expect(200)
+            .then(({ body }) => {
+                const endpoints = body.endpoints;
+                expect(typeof endpoints).toBe("object");
+                expect(Array.isArray(endpoints)).toBe(false);
+            });
+        });
+        test("Endpoints object contains keys for each endpoint in API", () => {
+            return request(app).get('/api').expect(200)
+            .then(({ body }) => {
+                const endpoints = body.endpoints;
+                expect(endpoints).toHaveProperty("GET /api");
+                expect(endpoints).toHaveProperty("GET /api/topics");
+                expect(endpoints).toHaveProperty("GET /api/users");
+                expect(endpoints).toHaveProperty("GET /api/articles");
+                expect(endpoints).toHaveProperty("GET /api/articles/:article_id");
+                expect(endpoints).toHaveProperty("PATCH /api/articles/:article_id");
+                expect(endpoints).toHaveProperty("GET /api/articles/:article_id/comments");
+                expect(endpoints).toHaveProperty("POST /api/articles/:article_id/comments");
+                expect(endpoints).toHaveProperty("DELETE /api/comments/:comment_id");
+            });
+        });
+    });
+});
+
+
 describe("/api/topics", () => {
     describe("GET", () => {
         test("Returns 'Status: 200' if no error in path", () => {
