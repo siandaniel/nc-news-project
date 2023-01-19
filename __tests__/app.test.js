@@ -453,12 +453,12 @@ describe("/api/comments/:comment_id", () => {
             return request(app).delete('/api/comments/1')
             .expect(204)
             .then(() => {
-                return db.query('SELECT * FROM comments;')
+                return request(app).get('/api/articles/9/comments')
+                .expect(200)
             })
-            .then(({rows}) => {
-                rows.forEach((row) => {
-                    expect(row.comment_id).not.toBe(1);
-                });
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(comments.length).toBe(1);
             });
         });
         test("Returns 'Status: 404' and relevant error message if comment ID does not exist in database", () => {
