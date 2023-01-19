@@ -468,5 +468,12 @@ describe("/api/comments/:comment_id", () => {
                 expect(body.msg).toBe("Not found");
             });
         });
+        test("Returns 'Status: 400' and relevant error message if comment ID is of incorrect data type", () => {
+            return request(app).delete('/api/comments/abc')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
+            });
+        });
     });
 });
