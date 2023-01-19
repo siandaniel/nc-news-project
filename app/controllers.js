@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment } = require('./models.js')
+const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers } = require('./models.js')
 
 const getTopics = (request, response, next) => {
     fetchTopics().then((topics) => {
@@ -57,6 +57,24 @@ const postComment = (request, response, next) => {
     else {
         response.status(204).send()
     }
-}
+};
+    
+const updateArticle = (request, response, next) => {
+    const { body } = request;
+    const { article_id } = request.params;
+    
+    updateVotes(body, article_id).then((article) => {
+    response.status(200).send({ updatedArticle: article });
+})
+.catch((error) => {
+    next(error)
+});
+};
 
-module.exports = { getTopics, getArticles, getArticleById, getComments, postComment };
+const getUsers = (request, response, next) => {
+    fetchUsers().then((users) => {
+        response.status(200).send({ users });       
+    });
+};
+
+module.exports = { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers };
