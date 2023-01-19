@@ -76,7 +76,10 @@ const deleteComment = (request, response, next) => {
     const { comment_id } = request.params;
     deleteCommentById(comment_id).then(() => {
         response.status(204).send();
-     });
+    })
+    .catch((error) => {
+        next(error)
+    })
 };
 
 module.exports = { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers, deleteComment };

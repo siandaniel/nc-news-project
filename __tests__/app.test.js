@@ -461,5 +461,12 @@ describe("/api/comments/:comment_id", () => {
                 });
             });
         });
+        test("Returns 'Status: 404' and relevant error message if comment ID does not exist in database", () => {
+            return request(app).delete('/api/comments/567')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found");
+            });
+        });
     });
 });
