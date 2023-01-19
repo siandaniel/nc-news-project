@@ -7,7 +7,7 @@ const fetchTopics = () => {
     });
 };
 
-const fetchArticles = (topic, sort_by='created_at') => {
+const fetchArticles = (topic, sort_by='created_at', order='desc') => {
     const queriesArr = [];
     let sqlFetchArticlesQuery = `SELECT articles.*, COUNT(comments.article_id) AS comment_count 
                                 FROM articles
@@ -15,7 +15,7 @@ const fetchArticles = (topic, sort_by='created_at') => {
     
     if (topic !== undefined) {
         if (!['mitch', 'cats', 'paper'].includes(topic.toLowerCase())) {
-            return Promise.reject({status: 400, msg: "Bad request - invalid topic name in query"})
+            return Promise.reject({status: 400, msg: "Bad request"})
         }
         else {
         sqlFetchArticlesQuery+= ` WHERE articles.topic = $1`
@@ -23,12 +23,13 @@ const fetchArticles = (topic, sort_by='created_at') => {
         }
     }
 
-    if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url'].includes(sort_by.toLowerCase())) {
-        return Promise.reject({status: 400, msg: "Bad request - invalid sort_by criteria"})
+    if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url'].includes(sort_by.toLowerCase()) ||
+        !['asc', 'desc'].includes(order.toLowerCase())) {
+        return Promise.reject({status: 400, msg: "Bad request"})
     }
 
     sqlFetchArticlesQuery+= ` GROUP BY articles.article_id
-                            ORDER BY articles.${sort_by} DESC`
+                            ORDER BY articles.${sort_by} ${order}`
     
 
     return db.query(sqlFetchArticlesQuery, queriesArr).then((result) => {
