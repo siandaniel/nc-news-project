@@ -1,9 +1,11 @@
 const express = require('express');
-const { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers } = require('./controllers.js');
+const { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers, deleteComment, getEndpoints } = require('./controllers.js');
 
 const app = express();
 
 app.use(express.json());
+
+app.get('/api', getEndpoints);
 
 app.get('/api/topics', getTopics);
 
@@ -18,6 +20,8 @@ app.get('/api/users', getUsers);
 app.post('/api/articles/:article_id/comments', postComment);
 
 app.patch('/api/articles/:article_id', updateArticle);
+
+app.delete('/api/comments/:comment_id', deleteComment)
 
 app.use((request, response, next) => {
     response.status(404).send({ msg: "Not found - this path does not exist" })

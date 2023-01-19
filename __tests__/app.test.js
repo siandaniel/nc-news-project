@@ -25,6 +25,35 @@ describe("/non-existent-or-misspelt-endpoint", () => {
     });
 });
 
+describe("/api", () => {
+    describe("GET", () => {
+        test("Returns 'Status: 200' with a JSON endpoints object", () => {
+            return request(app).get('/api').expect(200)
+            .then(({ body }) => {
+                const endpoints = body.endpoints;
+                expect(typeof endpoints).toBe("object");
+                expect(Array.isArray(endpoints)).toBe(false);
+            });
+        });
+        test("Endpoints object contains keys for each endpoint in API", () => {
+            return request(app).get('/api').expect(200)
+            .then(({ body }) => {
+                const endpoints = body.endpoints;
+                expect(endpoints).toHaveProperty("GET /api");
+                expect(endpoints).toHaveProperty("GET /api/topics");
+                expect(endpoints).toHaveProperty("GET /api/users");
+                expect(endpoints).toHaveProperty("GET /api/articles");
+                expect(endpoints).toHaveProperty("GET /api/articles/:article_id");
+                expect(endpoints).toHaveProperty("PATCH /api/articles/:article_id");
+                expect(endpoints).toHaveProperty("GET /api/articles/:article_id/comments");
+                expect(endpoints).toHaveProperty("POST /api/articles/:article_id/comments");
+                expect(endpoints).toHaveProperty("DELETE /api/comments/:comment_id");
+            });
+        });
+    });
+});
+
+
 describe("/api/topics", () => {
     describe("GET", () => {
         test("Returns 'Status: 200' if no error in path", () => {
@@ -501,6 +530,44 @@ describe("/api/users", () => {
                         })
                     )
                 });
+            });
+        });
+    });
+});
+
+describe("/api/comments/:comment_id", () => {
+    describe("DELETE", () => {
+        test("Returns a status 204 with no content", () => {
+            return request(app).delete('/api/comments/1')
+            .expect(204)
+            .then(( { body }) => {
+                expect(body).toEqual({});
+            });
+        });
+        test("Database no longer contains the comment with the specified ID", () => {
+            return request(app).delete('/api/comments/1')
+            .expect(204)
+            .then(() => {
+                return request(app).get('/api/articles/9/comments')
+                .expect(200)
+            })
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(comments.length).toBe(1);
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if comment ID does not exist in database", () => {
+            return request(app).delete('/api/comments/567')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found");
+            });
+        });
+        test("Returns 'Status: 400' and relevant error message if comment ID is of incorrect data type", () => {
+            return request(app).delete('/api/comments/abc')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
     });
