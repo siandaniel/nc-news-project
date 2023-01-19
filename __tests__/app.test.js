@@ -534,3 +534,41 @@ describe("/api/users", () => {
         });
     });
 });
+
+describe("/api/comments/:comment_id", () => {
+    describe("DELETE", () => {
+        test("Returns a status 204 with no content", () => {
+            return request(app).delete('/api/comments/1')
+            .expect(204)
+            .then(( { body }) => {
+                expect(body).toEqual({});
+            });
+        });
+        test("Database no longer contains the comment with the specified ID", () => {
+            return request(app).delete('/api/comments/1')
+            .expect(204)
+            .then(() => {
+                return request(app).get('/api/articles/9/comments')
+                .expect(200)
+            })
+            .then(({ body }) => {
+                const comments = body.comments;
+                expect(comments.length).toBe(1);
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if comment ID does not exist in database", () => {
+            return request(app).delete('/api/comments/567')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found");
+            });
+        });
+        test("Returns 'Status: 400' and relevant error message if comment ID is of incorrect data type", () => {
+            return request(app).delete('/api/comments/abc')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
+            });
+        });
+    });
+});
