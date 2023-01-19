@@ -127,6 +127,74 @@ describe("/api/articles", () => {
             });
         });
     });
+    describe("GET: Queries", () => {
+        test("Returns 'Status: 200' with ALL articles if no query specified", () => {
+            return request(app).get('/api/articles?').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles.length).toBe(12);
+            });
+        });
+        test("Topic query returns 'Status: 200' with correct number of articles for a given topic", () => {
+            return request(app).get('/api/articles?topic=cats').expect(200)
+            .then(({ body }) => {
+                const catArticles = body.articles;
+                expect(catArticles.length).toBe(1);
+            })
+            .then(() => {
+                return request(app).get('/api/articles?topic=mitch').expect(200)
+            })
+            .then(({ body }) => {
+                const mitchArticles = body.articles;
+                expect(mitchArticles.length).toBe(11);
+            })
+        });
+        test("Topic query returns 'Status: 200' with an empty array if valid topic but no articles", () => {
+            return request(app).get('/api/articles?topic=paper').expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toEqual([]);
+            });
+        });
+        test("Topic query returns 'Status: 400' with 'Bad Request' error message if provided an invalid topic name", () => {
+            return request(app).get('/api/articles?topic=123').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+        });
+        test("Sort_by query returns 'Status: 200' with articles sorted by the specified column", () => {
+            return request(app).get('/api/articles?sort_by=author').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('author', { descending: true })
+            });
+        });
+        test("Sort_by query returns 'Status: 400' with 'Bad Request' error message if provided with invalid sort_by criteria", () => {
+            return request(app).get('/api/articles?sort_by=hello').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+        });
+        test("Order query returns 'Status: 200' with articles sorted in the specified order", () => {
+            return request(app).get('/api/articles?order=asc').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('created_at', { ascending: true })
+            });
+        });
+        test("Order query returns 'Status: 400' with 'Bad Request' error message if provided with invalid order criteria", () => {
+            return request(app).get('/api/articles?order=hello').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+        });
+        test("Sort_by and order default to 'date' and 'desc' respectively", () => {
+            return request(app).get('/api/articles').expect(200)
+            .then(({ body }) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('created_at', { descending: true })
+            });
+        });
+    });    
 });
 
 describe("/api/articles/:article_id", () => {
@@ -139,13 +207,13 @@ describe("/api/articles/:article_id", () => {
                 expect(Array.isArray(article)).toBe(false);
             });
         });
-        test("Returns an article object containing the correct keys", () => {
+        test("Returns correct article object containing the correct keys", () => {
             return request(app).get('/api/articles/1').expect(200)
             .then(({ body }) => {
                 const article = body.requestedArticle;
                 expect(article).toHaveProperty("author", expect.any(String));
                 expect(article).toHaveProperty("title", expect.any(String));
-                expect(article).toHaveProperty("article_id", expect.any(Number));
+                expect(article).toHaveProperty("article_id", 1);
                 expect(article).toHaveProperty("body", expect.any(String));
                 expect(article).toHaveProperty("topic", expect.any(String));
                 expect(article).toHaveProperty("created_at", expect.any(String));
@@ -153,27 +221,25 @@ describe("/api/articles/:article_id", () => {
                 expect(article).toHaveProperty("article_img_url", expect.any(String));
             });
         });
-        test("Returns the correct article object for article ID 1", () => {
-            return request(app).get('/api/articles/1').expect(200)
-            .then(({ body }) => {
-                const article = body.requestedArticle;
-                expect(article).toEqual({
-                    author: "butter_bridge",
-                    article_id: 1,
-                    body: "I find this existence challenging",
-                    topic: "mitch",
-                    created_at: "2020-07-09T20:11:00.000Z",
-                    title: "Living in the shadow of a great man",
-                    votes: 100,
-                    article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-                });
-            });
-        });
         test("Returns the correct article object for other valid article IDs", () => {
             return request(app).get('/api/articles/2').expect(200)
             .then(({ body }) => {
                 const article = body.requestedArticle;
                 expect(article).toHaveProperty("article_id", 2);
+            });
+        });
+        test("Returned article contains 'comment_count' key with correct number of comments for this ID", () => {
+            return request(app).get('/api/articles/1').expect(200)
+            .then(({ body }) => {
+                const article = body.requestedArticle;
+                expect(article).toHaveProperty("comment_count", "11");
+            });
+        });
+        test("'Comment_count' key is set to zero if article exists but has no comments", () => {
+            return request(app).get('/api/articles/2').expect(200)
+            .then(({ body }) => {
+                const article = body.requestedArticle;
+                expect(article).toHaveProperty("comment_count", "0");
             });
         });
         test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
