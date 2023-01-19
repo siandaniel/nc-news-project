@@ -1,4 +1,5 @@
 const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById } = require('./models.js')
+const endpoints = require('../endpoints.json');
 
 const getTopics = (request, response, next) => {
     fetchTopics().then((topics) => {
@@ -87,4 +88,8 @@ const deleteComment = (request, response, next) => {
     })
 };
 
-module.exports = { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers, deleteComment };
+const getEndpoints = (request, response, next) => {
+    response.status(200).send({ endpoints: endpoints });
+};
+
+module.exports = { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers, deleteComment, getEndpoints };
