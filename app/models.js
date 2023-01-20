@@ -150,7 +150,7 @@ const fetchUserByUsername = (username) => {
 
 const updateCommentVotes = (body, comment_id) => {
     if (!body.inc_votes || Object.keys(body).length === 0) {
-        return Promise.reject({ status: 400, msg: "Bad request" })
+        return Promise.reject({ status: 400, msg: "Bad request - no inc_votes property found" })
     }
 
     let sqlUpdateVotesQuery = `UPDATE comments
@@ -159,7 +159,10 @@ const updateCommentVotes = (body, comment_id) => {
                                 RETURNING *`
 
     return db.query(sqlUpdateVotesQuery, [body.inc_votes, comment_id])
-        .then(({ rows }) => {
+        .then(({ rows, rowCount }) => {
+            if (rowCount === 0) {
+                return Promise.reject({ status: 404, msg: "Not found - no comment of this ID in database" })
+            }
             return rows[0];
         });
 };

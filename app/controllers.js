@@ -109,9 +109,9 @@ const addVoteToComment = (request, response, next) => {
     updateCommentVotes(body, comment_id).then((comment) => {
         response.status(200).send({ updatedComment: comment });
     })
-        .catch((error) => {
-            next(error)
-        });
+    .catch((error) => {
+        next(error)
+    });
 };
 
 module.exports = { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers, deleteComment, getEndpoints, getUserByUsername, addVoteToComment };
