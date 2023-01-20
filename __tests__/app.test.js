@@ -504,6 +504,17 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(body.msg).toBe("Not found - no article of this ID in database");
             });
         });
+        // test("Returns 'Status: 400' and 'Bad Request' error message if username is not in database", () => {
+        //     return request(app).post('/api/articles/392/comments')
+        //     .send({
+        //         body: "Mitch is cool",
+        //         username: "Sian"
+        //       })
+        //     .expect(400)
+        //     .then(({ body }) => {
+        //         expect(body.msg).toBe("Not found - no article of this ID in database");
+        //     });
+        // });
     });
 });
 
@@ -552,6 +563,18 @@ describe("api/users/:username", () => {
                 expect(user).toHaveProperty("username", "lurker");
                 expect(user).toHaveProperty("avatar_url", expect.any(String));
                 expect(user).toHaveProperty("name", expect.any(String));
+            });
+        });
+        test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
+            return request(app).get('/api/users/976').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
+            return request(app).get('/api/users/sian').expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no user of this username in database");
             });
         });
     });

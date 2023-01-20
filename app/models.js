@@ -127,13 +127,17 @@ const deleteCommentById = (comment_id) => {
 };
 
 const fetchUserByUsername = (username) => {
+    if (/^\d+$/.test(username) === true) {
+        return Promise.reject({ status: 400, msg: "Bad request - invalid data type" })
+    }
+    
     let sqlFetchUserQuery = `SELECT * FROM users
                             WHERE username = $1
                             `
 
     return db.query(sqlFetchUserQuery, [username]).then(({ rows, rowCount }) => {
         if (rowCount === 0) {
-            return Promise.reject({ status: 404, msg: "Not found - no user of this ID in database" })
+            return Promise.reject({ status: 404, msg: "Not found - no user of this username in database" })
         }
         else {
             return rows[0];

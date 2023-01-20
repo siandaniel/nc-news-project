@@ -97,6 +97,9 @@ const getUserByUsername = (request, response, next) => {
     fetchUserByUsername(username).then((user) => {
         response.status(200).send({ user });
     })
+    .catch((error) => {
+        next(error)
+    })
 }
 
 module.exports = { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers, deleteComment, getEndpoints, getUserByUsername };
