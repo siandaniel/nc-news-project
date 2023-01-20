@@ -535,6 +535,28 @@ describe("/api/users", () => {
     });
 });
 
+describe("api/users/:username", () => {
+    describe("GET", () => {
+        test("Returns 'Status: 200' with single user object if valid username", () => {
+            return request(app).get('/api/users/lurker').expect(200)
+            .then(({ body }) => {
+                const user = body.user;
+                expect(typeof user).toBe("object");
+                expect(Array.isArray(user)).toBe(false);
+            });
+        });
+        test("Returns correct user object containing the correct keys", () => {
+            return request(app).get('/api/users/lurker').expect(200)
+            .then(({ body }) => {
+                const user = body.user;
+                expect(user).toHaveProperty("username", "lurker");
+                expect(user).toHaveProperty("avatar_url", expect.any(String));
+                expect(user).toHaveProperty("name", expect.any(String));
+            });
+        });
+    });
+});
+
 describe("/api/comments/:comment_id", () => {
     describe("DELETE", () => {
         test("Returns a status 204 with no content", () => {
