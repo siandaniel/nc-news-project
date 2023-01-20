@@ -97,9 +97,9 @@ const updateVotes = (body, article_id) => {
             }
 
             let sqlUpdateVotesQuery = `UPDATE articles
-        SET votes = votes + $1
-        WHERE article_id = $2
-        RETURNING *`
+                                    SET votes = votes + $1
+                                    WHERE article_id = $2
+                                    RETURNING *`
 
             return db.query(sqlUpdateVotesQuery, [body.inc_votes, article_id])
         })
@@ -164,4 +164,30 @@ const updateCommentVotes = (body, comment_id) => {
         });
 };
 
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById, fetchUserByUsername, updateCommentVotes };
+const addArticle = (article) => {
+    return fetchUserByUsername(article.author)
+    .then(() => {
+        const formattedArticle = [[article.title, article.topic, article.author, article.body, article.article_img_url]]
+
+        let sqlAddArticleString = format(`INSERT INTO articles
+                                (title, topic, author, body, article_img_url)
+                                VALUES
+                                %L
+                                RETURNING *`, formattedArticle)
+
+        return db.query(sqlAddArticleString)
+    })
+    .then(({ rows }) => {
+        const newArticle = rows[0];
+        return fetchArticleById(newArticle.article_id)
+    });
+};
+
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById, fetchUserByUsername, updateCommentVotes, addArticle };
+
+// let sqlFetchArticleByIdQuery = `SELECT articles.*, COUNT(comments.article_id) AS comment_count 
+// FROM articles
+// LEFT JOIN comments ON articles.article_id = comments.article_id
+// WHERE articles.article_id = $1
+// GROUP BY articles.article_id
+// `

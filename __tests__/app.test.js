@@ -660,3 +660,37 @@ describe("/api/comments/:comment_id", () => {
         });
     });
 });
+
+describe("POST", () => {
+    test("Returns 'Status: 204' with empty object if sent empty request body", () => {
+        return request(app).post('/api/articles')
+        .send()
+        .expect(204)
+        .then(({ body }) => {
+            expect(body).toEqual({})
+        });
+    });
+    test("Returns 'Status: 201' with the article object that has been added", () => {
+        return request(app).post('/api/articles')
+        .send({
+            author: "rogersop",
+            title: "Famous cats from film and TV",
+            body: "Lots of text about famous cats...",
+            topic: "cats",
+            article_img_url: "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028"
+          })
+        .expect(201)
+        .then(({ body }) => {
+            articlePosted = body.articlePosted
+            expect(articlePosted).toHaveProperty("article_id", 13);
+            expect(articlePosted).toHaveProperty("author", "rogersop");
+            expect(articlePosted).toHaveProperty("title", "Famous cats from film and TV");
+            expect(articlePosted).toHaveProperty("body", "Lots of text about famous cats...");
+            expect(articlePosted).toHaveProperty("topic", "cats");
+            expect(articlePosted).toHaveProperty("article_img_url", "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028");
+            expect(articlePosted).toHaveProperty("votes", 0);
+            expect(articlePosted).toHaveProperty("created_at");
+            expect(articlePosted).toHaveProperty("comment_count", "0");
+        });
+    });
+});
