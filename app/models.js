@@ -1,5 +1,6 @@
 const db = require('../db/connection.js');
 const format = require('pg-format');
+const { getUserByUsername } = require('./controllers.js');
 
 const fetchTopics = () => {
     return db.query(`SELECT * FROM topics`).then((result) => {
@@ -69,6 +70,9 @@ const fetchCommentsById = (article_id) => {
 
 const addComment = (comment, article_id) => {
     return fetchArticleById(article_id)
+        .then(() => {
+            return fetchUserByUsername(comment.username)
+        })
         .then(() => {
             const formattedComment = [[comment.body, article_id, comment.username]]
 
