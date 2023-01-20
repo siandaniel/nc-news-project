@@ -622,7 +622,7 @@ describe("/api/comments/:comment_id", () => {
             .send()
             .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe("Bad request")
+                expect(body.msg).toBe("Bad request - no inc_votes property found")
             });
         });
         test("Returns 'Status: 200' with updated comment object", () => {
@@ -657,6 +657,132 @@ describe("/api/comments/:comment_id", () => {
                 expect(updatedComment).toHaveProperty("comment_id", 1)
                 expect(updatedComment).toHaveProperty("votes", 11)
             });
+        });
+        test("Returns 'Status: 400' and relevant error message if comment ID is of incorrect data type", () => {
+            return request(app).patch('/api/comments/abc')
+            .send({ inc_votes: 2 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if comment ID does not exist in database", () => {
+            return request(app).patch('/api/comments/474')
+            .send({ inc_votes: 2 })
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no comment of this ID in database");
+            });
+        });
+        test("Returns 'Status: 400' and 'Bad request' error message if no 'inc_votes' property on request body", () => {
+            return request(app).patch('/api/comments/1')
+            .send({ change_votes: 2 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - no inc_votes property found");
+            });
+        });
+        test("Returns 'Status: 400' and 'Bad request' error message if 'inc_votes' property is of incorrect data type", () => {
+            return request(app).patch('/api/comments/1')
+            .send({ inc_votes: "abc" })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
+            });
+        });
+    });
+});
+
+describe("POST", () => {
+    test("Returns 'Status: 204' with empty object if sent empty request body", () => {
+        return request(app).post('/api/articles')
+        .send()
+        .expect(204)
+        .then(({ body }) => {
+            expect(body).toEqual({})
+        });
+    });
+    test("Returns 'Status: 201' with the article object that has been added", () => {
+        return request(app).post('/api/articles')
+        .send({
+            author: "rogersop",
+            title: "Famous cats from film and TV",
+            body: "Lots of text about famous cats...",
+            topic: "cats",
+            article_img_url: "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028"
+          })
+        .expect(201)
+        .then(({ body }) => {
+            articlePosted = body.articlePosted
+            expect(articlePosted).toHaveProperty("article_id", 13);
+            expect(articlePosted).toHaveProperty("author", "rogersop");
+            expect(articlePosted).toHaveProperty("title", "Famous cats from film and TV");
+            expect(articlePosted).toHaveProperty("body", "Lots of text about famous cats...");
+            expect(articlePosted).toHaveProperty("topic", "cats");
+            expect(articlePosted).toHaveProperty("article_img_url", "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028");
+            expect(articlePosted).toHaveProperty("votes", 0);
+            expect(articlePosted).toHaveProperty("created_at");
+            expect(articlePosted).toHaveProperty("comment_count", "0");
+        });
+    });
+    test("Articles database is updated with the new article", () => {
+        return request(app).post('/api/articles')
+        .send({
+            author: "rogersop",
+            title: "Famous cats from film and TV",
+            body: "Lots of text about famous cats...",
+            topic: "cats",
+            article_img_url: "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028"
+          })
+        .expect(201)
+        .then(() => {
+            return db.query('SELECT * FROM articles;')
+        })
+        .then(({rows}) => {
+            expect(rows.length).toBe(13)
+            expect(rows[rows.length-1].article_id).toBe(13);
+            expect(rows[rows.length-1].title).toBe("Famous cats from film and TV");
+        })
+    });
+    test("Returns 'Status: 404' and relevant error message if username is not in database", () => {
+        return request(app).post('/api/articles')
+        .send({
+            author: "Sian",
+            title: "Famous cats from film and TV",
+            body: "Lots of text about famous cats...",
+            topic: "cats",
+            article_img_url: "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028"
+          })
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Not found - no user of this username in database");
+        });
+    });
+    test("Returns 'Status: 400' and 'Bad request' error message if any expected keys missing from request body", () => {
+        return request(app).post('/api/articles')
+        .send({
+            author: "rogersop",
+            body: "Lots of text about famous cats...",
+            topic: "cats",
+            article_img_url: "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028"
+          })
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad request - expected body key missing");
+        });
+    });
+    test("Returns 'Status: 400' and 'Bad request' error message if any body values of incorrect data type", () => {
+        return request(app).post('/api/articles')
+        .send({
+            author: 123,
+            title: "Famous cats from film and TV",
+            body: "Lots of text about famous cats...",
+            topic: "cats",
+            article_img_url: "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028"
+          })
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad request - invalid data type");
         });
     });
 });

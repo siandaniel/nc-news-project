@@ -97,9 +97,9 @@ const updateVotes = (body, article_id) => {
             }
 
             let sqlUpdateVotesQuery = `UPDATE articles
-        SET votes = votes + $1
-        WHERE article_id = $2
-        RETURNING *`
+                                    SET votes = votes + $1
+                                    WHERE article_id = $2
+                                    RETURNING *`
 
             return db.query(sqlUpdateVotesQuery, [body.inc_votes, article_id])
         })
@@ -150,7 +150,7 @@ const fetchUserByUsername = (username) => {
 
 const updateCommentVotes = (body, comment_id) => {
     if (!body.inc_votes || Object.keys(body).length === 0) {
-        return Promise.reject({ status: 400, msg: "Bad request" })
+        return Promise.reject({ status: 400, msg: "Bad request - no inc_votes property found" })
     }
 
     let sqlUpdateVotesQuery = `UPDATE comments
@@ -159,9 +159,43 @@ const updateCommentVotes = (body, comment_id) => {
                                 RETURNING *`
 
     return db.query(sqlUpdateVotesQuery, [body.inc_votes, comment_id])
-        .then(({ rows }) => {
+        .then(({ rows, rowCount }) => {
+            if (rowCount === 0) {
+                return Promise.reject({ status: 404, msg: "Not found - no comment of this ID in database" })
+            }
             return rows[0];
         });
 };
 
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById, fetchUserByUsername, updateCommentVotes };
+const addArticle = (article) => {
+
+    if (!article.author || !article.title || !article.body || !article.topic || !article.article_img_url ) {
+        return Promise.reject({ status: 400, msg: "Bad request - expected body key missing" })
+    }
+
+    return fetchUserByUsername(article.author)
+    .then(() => {
+        const formattedArticle = [[article.title, article.topic, article.author, article.body, article.article_img_url]]
+
+        let sqlAddArticleString = format(`INSERT INTO articles
+                                (title, topic, author, body, article_img_url)
+                                VALUES
+                                %L
+                                RETURNING *`, formattedArticle)
+
+        return db.query(sqlAddArticleString)
+    })
+    .then(({ rows }) => {
+        const newArticle = rows[0];
+        return fetchArticleById(newArticle.article_id)
+    });
+};
+
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById, fetchUserByUsername, updateCommentVotes, addArticle };
+
+// let sqlFetchArticleByIdQuery = `SELECT articles.*, COUNT(comments.article_id) AS comment_count 
+// FROM articles
+// LEFT JOIN comments ON articles.article_id = comments.article_id
+// WHERE articles.article_id = $1
+// GROUP BY articles.article_id
+// `
