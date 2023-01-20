@@ -658,6 +658,39 @@ describe("/api/comments/:comment_id", () => {
                 expect(updatedComment).toHaveProperty("votes", 11)
             });
         });
+        test("Returns 'Status: 400' and relevant error message if comment ID is of incorrect data type", () => {
+            return request(app).patch('/api/comments/abc')
+            .send({ inc_votes: 2 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
+            });
+        });
+        // test("Returns 'Status: 404' and relevant error message if comment ID does not exist in database", () => {
+        //     return request(app).patch('/api/comments/474')
+        //     .send({ inc_votes: 2 })
+        //     .expect(404)
+        //     .then(({ body }) => {
+        //         expect(body.msg).toBe("Not found - no comment of this ID in database");
+        //     });
+        // });
+        // test("Returns 'Status: 400' and 'Bad request' error message if no 'inc_votes' property on request body", () => {
+        //     return request(app).patch('/api/comments/1')
+        //     .send({ change_votes: 2 })
+        //     .expect(400)
+        //     .then(({ body }) => {
+        //         expect(body.msg).toBe("Bad request - no inc_votes property found");
+        //     });
+        // });
+        test("Returns 'Status: 400' and 'Bad request' error message if 'inc_votes' property is of incorrect data type", () => {
+            return request(app).patch('/api/comments/1')
+            .send({ inc_votes: "abc" })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
+            });
+        });
+
     });
 });
 
