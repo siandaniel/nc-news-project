@@ -5,24 +5,7 @@ const apiRouter = require('../routes/api-router.js')
 const app = express();
 
 app.use(express.json());
-
 app.use('/api', apiRouter);
-
-// app.get('/api', getEndpoints);
-
-// app.get('/api/topics', getTopics);
-
-// app.get('/api/articles', getArticles);
-
-// app.get('/api/articles/:article_id', getArticleById);
-
-// app.get('/api/articles/:article_id/comments', getComments);
-
-// app.get('/api/users', getUsers);
-
-app.post('/api/articles/:article_id/comments', postComment);
-
-app.patch('/api/articles/:article_id', updateArticle);
 
 app.delete('/api/comments/:comment_id', deleteComment)
 
