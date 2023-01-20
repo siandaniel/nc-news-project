@@ -712,37 +712,18 @@ describe("POST", () => {
             expect(rows[rows.length-1].title).toBe("Famous cats from film and TV");
         })
     });
-    // test("Returns 'Status: 400' and relevant error message if article ID is of incorrect data type", () => {
-    //     return request(app).post('/api/articles/abc/comments')
-    //     .send({
-    //         body: "Mitch is cool",
-    //         username: "rogersop"
-    //       })
-    //     .expect(400)
-    //     .then(({ body }) => {
-    //         expect(body.msg).toBe("Bad request - invalid data type");
-    //     });
-    // });
-    // test("Returns 'Status: 404' and relevant error message if article ID does not exist in database", () => {
-    //     return request(app).post('/api/articles/392/comments')
-    //     .send({
-    //         body: "Mitch is cool",
-    //         username: "rogersop"
-    //       })
-    //     .expect(404)
-    //     .then(({ body }) => {
-    //         expect(body.msg).toBe("Not found - no article of this ID in database");
-    //     });
-    // });
-    // test("Returns 'Status: 404' and relevant error message if username is not in database", () => {
-    //     return request(app).post('/api/articles/1/comments')
-    //     .send({
-    //         body: "Mitch is cool",
-    //         username: "Sian"
-    //       })
-    //     .expect(404)
-    //     .then(({ body }) => {
-    //         expect(body.msg).toBe("Not found - no user of this username in database");
-    //     });
-    // });
+    test("Returns 'Status: 404' and relevant error message if username is not in database", () => {
+        return request(app).post('/api/articles')
+        .send({
+            author: "Sian",
+            title: "Famous cats from film and TV",
+            body: "Lots of text about famous cats...",
+            topic: "cats",
+            article_img_url: "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028"
+          })
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Not found - no user of this username in database");
+        });
+    });
 });
