@@ -690,7 +690,6 @@ describe("/api/comments/:comment_id", () => {
                 expect(body.msg).toBe("Bad request - invalid data type");
             });
         });
-
     });
 });
 
@@ -757,6 +756,33 @@ describe("POST", () => {
         .expect(404)
         .then(({ body }) => {
             expect(body.msg).toBe("Not found - no user of this username in database");
+        });
+    });
+    test("Returns 'Status: 400' and 'Bad request' error message if any expected keys missing from request body", () => {
+        return request(app).post('/api/articles')
+        .send({
+            author: "rogersop",
+            body: "Lots of text about famous cats...",
+            topic: "cats",
+            article_img_url: "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028"
+          })
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad request - expected body key missing");
+        });
+    });
+    test("Returns 'Status: 400' and 'Bad request' error message if any body values of incorrect data type", () => {
+        return request(app).post('/api/articles')
+        .send({
+            author: 123,
+            title: "Famous cats from film and TV",
+            body: "Lots of text about famous cats...",
+            topic: "cats",
+            article_img_url: "https://static.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest/scale-to-width-down/300?cb=20110424163028"
+          })
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad request - invalid data type");
         });
     });
 });

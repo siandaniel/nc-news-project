@@ -168,6 +168,11 @@ const updateCommentVotes = (body, comment_id) => {
 };
 
 const addArticle = (article) => {
+
+    if (!article.author || !article.title || !article.body || !article.topic || !article.article_img_url ) {
+        return Promise.reject({ status: 400, msg: "Bad request - expected body key missing" })
+    }
+
     return fetchUserByUsername(article.author)
     .then(() => {
         const formattedArticle = [[article.title, article.topic, article.author, article.body, article.article_img_url]]
