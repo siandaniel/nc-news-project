@@ -1,14 +1,9 @@
 const express = require('express');
-const { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers, deleteComment, getEndpoints } = require('./controllers.js');
-const apiRouter = require('../routes/api-router.js')
-
+const apiRouter = require('../routes/api-router.js');
 const app = express();
 
 app.use(express.json());
 app.use('/api', apiRouter);
-
-app.delete('/api/comments/:comment_id', deleteComment)
-
 app.use((request, response, next) => {
     response.status(404).send({ msg: "Not found - this path does not exist" })
 });
