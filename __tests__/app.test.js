@@ -504,6 +504,17 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(body.msg).toBe("Not found - no article of this ID in database");
             });
         });
+        test("Returns 'Status: 404' and relevant error message if username is not in database", () => {
+            return request(app).post('/api/articles/1/comments')
+            .send({
+                body: "Mitch is cool",
+                username: "Sian"
+              })
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no user of this username in database");
+            });
+        });
     });
 });
 
@@ -530,6 +541,40 @@ describe("/api/users", () => {
                         })
                     )
                 });
+            });
+        });
+    });
+});
+
+describe("api/users/:username", () => {
+    describe("GET", () => {
+        test("Returns 'Status: 200' with single user object if valid username", () => {
+            return request(app).get('/api/users/lurker').expect(200)
+            .then(({ body }) => {
+                const user = body.user;
+                expect(typeof user).toBe("object");
+                expect(Array.isArray(user)).toBe(false);
+            });
+        });
+        test("Returns correct user object containing the correct keys", () => {
+            return request(app).get('/api/users/lurker').expect(200)
+            .then(({ body }) => {
+                const user = body.user;
+                expect(user).toHaveProperty("username", "lurker");
+                expect(user).toHaveProperty("avatar_url", expect.any(String));
+                expect(user).toHaveProperty("name", expect.any(String));
+            });
+        });
+        test("Returns 'Status: 400' and relevant error message if username is of incorrect data type", () => {
+            return request(app).get('/api/users/976').expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request - invalid data type");
+            });
+        });
+        test("Returns 'Status: 404' and relevant error message if username does not exist in database", () => {
+            return request(app).get('/api/users/sian').expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found - no user of this username in database");
             });
         });
     });
