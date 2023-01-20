@@ -1,6 +1,5 @@
 const db = require('../db/connection.js');
 const format = require('pg-format');
-const { getUserByUsername } = require('./controllers.js');
 
 const fetchTopics = () => {
     return db.query(`SELECT * FROM topics`).then((result) => {
