@@ -616,4 +616,47 @@ describe("/api/comments/:comment_id", () => {
             });
         });
     });
+    describe("PATCH", () => {
+        test("Returns 'Status: 400' with 'Bad request' error message if sent empty request body", () => {
+            return request(app).patch('/api/comments/1')
+            .send()
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request")
+            });
+        });
+        test("Returns 'Status: 200' with updated comment object", () => {
+            return request(app).patch('/api/comments/1')
+            .send({ inc_votes: 1 })
+            .expect(200)
+            .then(({ body }) => {
+                expect(typeof body.updatedComment).toBe("object");
+                expect(Array.isArray(body.updatedComment)).toBe(false)
+            });
+        });
+        test("Returns correct comment object for comment ID with expected keys", () => {
+            return request(app).patch('/api/comments/1')
+            .send({ inc_votes: 1 })
+            .expect(200)
+            .then(({ body }) => {
+                const updatedComment = body.updatedComment;
+                expect(updatedComment).toHaveProperty("comment_id", 1)
+                expect(updatedComment).toHaveProperty("body")
+                expect(updatedComment).toHaveProperty("votes")
+                expect(updatedComment).toHaveProperty("author")
+                expect(updatedComment).toHaveProperty("article_id")
+                expect(updatedComment).toHaveProperty("created_at")
+            });
+        });
+        test("Returns comment object with 'votes' key updated by correct amount, including by negative numbers", () => {
+            return request(app).patch('/api/comments/1')
+            .send({ inc_votes: -5 })
+            .expect(200)
+            .then(({ body }) => {
+                const updatedComment = body.updatedComment;
+                expect(updatedComment).toHaveProperty("comment_id", 1)
+                expect(updatedComment).toHaveProperty("votes", 11)
+            });
+        });
+    });
 });

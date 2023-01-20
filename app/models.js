@@ -133,7 +133,7 @@ const fetchUserByUsername = (username) => {
     if (/^\d+$/.test(username) === true) {
         return Promise.reject({ status: 400, msg: "Bad request - invalid data type" })
     }
-    
+
     let sqlFetchUserQuery = `SELECT * FROM users
                             WHERE username = $1
                             `
@@ -146,6 +146,22 @@ const fetchUserByUsername = (username) => {
             return rows[0];
         }
     });
-}
+};
 
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById, fetchUserByUsername };
+const updateCommentVotes = (body, comment_id) => {
+    if (!body.inc_votes || Object.keys(body).length === 0) {
+        return Promise.reject({ status: 400, msg: "Bad request" })
+    }
+
+    let sqlUpdateVotesQuery = `UPDATE comments
+                                SET votes = votes + $1
+                                WHERE comment_id = $2
+                                RETURNING *`
+
+    return db.query(sqlUpdateVotesQuery, [body.inc_votes, comment_id])
+        .then(({ rows }) => {
+            return rows[0];
+        });
+};
+
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById, fetchUserByUsername, updateCommentVotes };

@@ -1,9 +1,9 @@
-const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById, fetchUserByUsername } = require('./models.js')
+const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById, fetchUserByUsername, updateCommentVotes } = require('./models.js')
 const endpoints = require('../endpoints.json');
 
 const getTopics = (request, response, next) => {
     fetchTopics().then((topics) => {
-        response.status(200).send({ topics});       
+        response.status(200).send({ topics });
     })
 };
 
@@ -11,11 +11,11 @@ const getArticles = (request, response, next) => {
     const { topic, sort_by, order } = request.query
 
     fetchArticles(topic, sort_by, order).then((articles) => {
-        response.status(200).send({ articles });       
+        response.status(200).send({ articles });
     })
-    .catch((error) => {
-        next(error)
-    });
+        .catch((error) => {
+            next(error)
+        });
 };
 
 const getArticleById = (request, response, next) => {
@@ -23,24 +23,24 @@ const getArticleById = (request, response, next) => {
     fetchArticleById(article_id).then((article) => {
         response.status(200).send({ requestedArticle: article });
     })
-    .catch((error) => {
-        next(error)
-    });
+        .catch((error) => {
+            next(error)
+        });
 };
 
 const getComments = (request, response, next) => {
     const { article_id } = request.params;
 
     fetchArticleById(article_id)
-    .then(() => {
-        return fetchCommentsById(article_id)
-    })
-    .then((comments) => {
-        response.status(200).send({ comments })
-    })
-    .catch((error) => {
-        next(error)
-    })
+        .then(() => {
+            return fetchCommentsById(article_id)
+        })
+        .then((comments) => {
+            response.status(200).send({ comments })
+        })
+        .catch((error) => {
+            next(error)
+        })
 };
 
 const postComment = (request, response, next) => {
@@ -51,30 +51,30 @@ const postComment = (request, response, next) => {
         addComment(body, article_id).then((comment) => {
             response.status(201).send({ commentPosted: comment })
         })
-        .catch((error) => {
-            next(error)
-        })
+            .catch((error) => {
+                next(error)
+            })
     }
     else {
         response.status(204).send()
     }
 };
-    
+
 const updateArticle = (request, response, next) => {
     const { body } = request;
     const { article_id } = request.params;
-    
+
     updateVotes(body, article_id).then((article) => {
-    response.status(200).send({ updatedArticle: article });
-})
-.catch((error) => {
-    next(error)
-});
+        response.status(200).send({ updatedArticle: article });
+    })
+        .catch((error) => {
+            next(error)
+        });
 };
 
 const getUsers = (request, response, next) => {
     fetchUsers().then((users) => {
-        response.status(200).send({ users });       
+        response.status(200).send({ users });
     });
 };
 
@@ -83,9 +83,9 @@ const deleteComment = (request, response, next) => {
     deleteCommentById(comment_id).then(() => {
         response.status(204).send();
     })
-    .catch((error) => {
-        next(error)
-    })
+        .catch((error) => {
+            next(error)
+        })
 };
 
 const getEndpoints = (request, response, next) => {
@@ -97,9 +97,21 @@ const getUserByUsername = (request, response, next) => {
     fetchUserByUsername(username).then((user) => {
         response.status(200).send({ user });
     })
-    .catch((error) => {
-        next(error)
-    })
+        .catch((error) => {
+            next(error)
+        })
 }
 
-module.exports = { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers, deleteComment, getEndpoints, getUserByUsername };
+const addVoteToComment = (request, response, next) => {
+    const { body } = request;
+    const { comment_id } = request.params;
+
+    updateCommentVotes(body, comment_id).then((comment) => {
+        response.status(200).send({ updatedComment: comment });
+    })
+        .catch((error) => {
+            next(error)
+        });
+};
+
+module.exports = { getTopics, getArticles, getArticleById, getComments, postComment, updateArticle, getUsers, deleteComment, getEndpoints, getUserByUsername, addVoteToComment };
