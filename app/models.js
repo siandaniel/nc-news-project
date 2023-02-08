@@ -8,33 +8,41 @@ const fetchTopics = () => {
 };
 
 const fetchArticles = (topic, sort_by = 'created_at', order = 'desc') => {
-    const queriesArr = [];
-    let sqlFetchArticlesQuery = `SELECT articles.*, COUNT(comments.article_id) AS comment_count 
+    return fetchTopics()
+        .then((topics) => {
+            const topicNames = topics.map((topic) => {
+                return topic.slug;
+            })
+            const queriesArr = [];
+            let sqlFetchArticlesQuery = `SELECT articles.*, COUNT(comments.article_id) AS comment_count 
                                 FROM articles
                                 LEFT JOIN comments ON articles.article_id = comments.article_id`
 
-    if (topic !== undefined) {
-        if (!['mitch', 'cats', 'paper'].includes(topic.toLowerCase())) {
-            return Promise.reject({ status: 400, msg: "Bad request" })
-        }
-        else {
-            sqlFetchArticlesQuery += ` WHERE articles.topic = $1`
-            queriesArr.push(topic)
-        }
-    }
+            if (topic !== undefined) {
+                console.log(topicNames, "<<TOPICS")
+                console.log(topic, "<<SINGLE TOPIC")
+                if (!topicNames.includes(topic.toLowerCase())) {
+                    return Promise.reject({ status: 400, msg: "Bad request" })
+                }
+                else {
+                    sqlFetchArticlesQuery += ` WHERE articles.topic = $1`
+                    queriesArr.push(topic)
+                }
+            }
 
-    if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url'].includes(sort_by.toLowerCase()) ||
-        !['asc', 'desc'].includes(order.toLowerCase())) {
-        return Promise.reject({ status: 400, msg: "Bad request" })
-    }
+            if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url'].includes(sort_by.toLowerCase()) ||
+                !['asc', 'desc'].includes(order.toLowerCase())) {
+                return Promise.reject({ status: 400, msg: "Bad request" })
+            }
 
-    sqlFetchArticlesQuery += ` GROUP BY articles.article_id
+            sqlFetchArticlesQuery += ` GROUP BY articles.article_id
                             ORDER BY articles.${sort_by} ${order}`
 
 
-    return db.query(sqlFetchArticlesQuery, queriesArr).then((result) => {
-        return result.rows;
-    });
+            return db.query(sqlFetchArticlesQuery, queriesArr).then((result) => {
+                return result.rows;
+            })
+        })
 };
 
 
@@ -169,26 +177,26 @@ const updateCommentVotes = (body, comment_id) => {
 
 const addArticle = (article) => {
 
-    if (!article.author || !article.title || !article.body || !article.topic || !article.article_img_url ) {
+    if (!article.author || !article.title || !article.body || !article.topic || !article.article_img_url) {
         return Promise.reject({ status: 400, msg: "Bad request - expected body key missing" })
     }
 
     return fetchUserByUsername(article.author)
-    .then(() => {
-        const formattedArticle = [[article.title, article.topic, article.author, article.body, article.article_img_url]]
+        .then(() => {
+            const formattedArticle = [[article.title, article.topic, article.author, article.body, article.article_img_url]]
 
-        let sqlAddArticleString = format(`INSERT INTO articles
+            let sqlAddArticleString = format(`INSERT INTO articles
                                 (title, topic, author, body, article_img_url)
                                 VALUES
                                 %L
                                 RETURNING *`, formattedArticle)
 
-        return db.query(sqlAddArticleString)
-    })
-    .then(({ rows }) => {
-        const newArticle = rows[0];
-        return fetchArticleById(newArticle.article_id)
-    });
+            return db.query(sqlAddArticleString)
+        })
+        .then(({ rows }) => {
+            const newArticle = rows[0];
+            return fetchArticleById(newArticle.article_id)
+        });
 };
 
 module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsById, addComment, updateVotes, fetchUsers, deleteCommentById, fetchUserByUsername, updateCommentVotes, addArticle };
