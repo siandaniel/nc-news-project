@@ -19,8 +19,6 @@ const fetchArticles = (topic, sort_by = 'created_at', order = 'desc') => {
                                 LEFT JOIN comments ON articles.article_id = comments.article_id`
 
             if (topic !== undefined) {
-                console.log(topicNames, "<<TOPICS")
-                console.log(topic, "<<SINGLE TOPIC")
                 if (!topicNames.includes(topic.toLowerCase())) {
                     return Promise.reject({ status: 400, msg: "Bad request" })
                 }
