@@ -28,7 +28,7 @@ const fetchArticles = (topic, sort_by = 'created_at', order = 'desc') => {
                 }
             }
 
-            if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url'].includes(sort_by.toLowerCase()) ||
+            if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url', 'comment_count'].includes(sort_by.toLowerCase()) ||
                 !['asc', 'desc'].includes(order.toLowerCase())) {
                 return Promise.reject({ status: 400, msg: "Bad request" })
             }
