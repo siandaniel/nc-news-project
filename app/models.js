@@ -34,7 +34,7 @@ const fetchArticles = (topic, sort_by = 'created_at', order = 'desc') => {
             }
 
             sqlFetchArticlesQuery += ` GROUP BY articles.article_id
-                            ORDER BY articles.${sort_by} ${order}`
+                            ORDER BY ${sort_by === 'comment_count' ? 'comment_count' : `articles.${sort_by}`} ${order}`
 
 
             return db.query(sqlFetchArticlesQuery, queriesArr).then((result) => {
